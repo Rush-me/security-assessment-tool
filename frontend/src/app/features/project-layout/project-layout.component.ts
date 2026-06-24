@@ -192,14 +192,16 @@ export class ProjectLayoutComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.route.paramMap.subscribe(params => {
-      const idStr = params.get('projectId');
-      if (idStr) {
-        const id = parseInt(idStr, 10);
-        this.projectId.set(id);
-        this.loadProjectDetails(id);
-      }
-    });
+    this._subs.add(
+      this.route.paramMap.subscribe(params => {
+        const idStr = params.get('projectId');
+        if (idStr) {
+          const id = parseInt(idStr, 10);
+          this.projectId.set(id);
+          this.loadProjectDetails(id);
+        }
+      })
+    );
   }
 
   loadProjectDetails(id: number) {
