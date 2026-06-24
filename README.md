@@ -63,7 +63,7 @@ All data is stored **locally on the user's machine**. Nothing leaves the device 
 | Maven | 3.8+ | `mvn -version` |
 | Node.js | 18+ | `node -version` |
 | npm | 9+ | `npm -version` |
-| Angular CLI | 17+ | `ng version` |
+| Angular CLI | 18+ | `ng version` |
 
 ---
 
