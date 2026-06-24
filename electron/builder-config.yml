@@ -7,12 +7,11 @@ directories:
   output: dist
   buildResources: assets
 
-# ── Files bundled inside the Electron app ───────────────────────────────────
 files:
   - main.js
   - preload.js
   - splash.html
-
+  - assets/**
 # ── Extra resources copied alongside the app (not inside the asar) ──────────
 extraResources:
   # Pre-built Angular UI
