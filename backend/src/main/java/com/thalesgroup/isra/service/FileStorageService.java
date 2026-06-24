@@ -65,13 +65,16 @@ public class FileStorageService {
 
     public Resource loadFileAsResource(String filePathString) {
         try {
-            Path filePath = Paths.get(filePathString).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists()) {
-                return resource;
-            } else {
-                throw new RuntimeException("File not found: " + filePathString);
+            Path filePath = Paths.get(filePathString).toAbsolutePath().normalize();
+            if (!filePath.startsWith(this.fileStorageLocation)) {
+                throw new RuntimeException("Invalid file path: " + filePathString);
             }
+
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            }
+            throw new RuntimeException("File not found: " + filePathString);
         } catch (MalformedURLException ex) {
             throw new RuntimeException("File not found: " + filePathString, ex);
         }
