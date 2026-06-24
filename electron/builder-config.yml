@@ -1,0 +1,79 @@
+appId: com.thalesgroup.isra
+productName: SecurityRiskAssessmentTool
+copyright: Copyright © 2024 Thales Group
+
+# ── Directories ──────────────────────────────────────────────────────────────
+directories:
+  output: dist
+  buildResources: assets
+
+files:
+  - main.js
+  - preload.js
+  - splash.html
+  - assets/**
+# ── Extra resources copied alongside the app (not inside the asar) ──────────
+extraResources:
+  # Pre-built Angular UI
+  - from: ../frontend/dist/frontend/browser
+    to: frontend
+    filter: ["**/*"]
+  # Spring Boot fat JAR
+  - from: ../backend/target/security-risk-assessment-tool.jar
+    to: backend/security-risk-assessment-tool.jar
+  # Bundled JRE (populated by scripts/download-jre.js before build)
+  - from: jre
+    to: jre
+    filter: ["**/*"]
+
+# ── Windows ──────────────────────────────────────────────────────────────────
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: assets/icon.ico
+  artifactName: SecurityRiskAssessmentToolSetup.exe
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Thales ISRA
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+
+# ── Linux ────────────────────────────────────────────────────────────────────
+linux:
+  maintainer: Thales Group <support@thalesgroup.com>
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  icon: assets/icon.png
+  category: Office
+  description: Thales Security Risk Assessment Tool
+  artifactName: SecurityRiskAssessmentTool.AppImage
+
+deb:
+  artifactName: security-risk-assessment-tool.deb
+
+# ── macOS ────────────────────────────────────────────────────────────────────
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+    - target: zip
+      arch: [x64, arm64]
+  icon: assets/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  artifactName: SecurityRiskAssessmentTool.dmg
+
+dmg:
+  artifactName: SecurityRiskAssessmentTool.dmg
+
+# ── Publishing ───────────────────────────────────────────────────────────────
+publish: null
