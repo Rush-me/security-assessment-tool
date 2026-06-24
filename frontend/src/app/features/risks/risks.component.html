@@ -30,7 +30,7 @@
 
   <!-- Two-column Split Layout -->
   <div class="split-layout">
-    
+
     <!-- LEFT PANEL: Risk Register Sidebar -->
     <div class="left-panel">
       <div class="register-card">
@@ -71,7 +71,7 @@
     <div class="right-panel">
       @if (selectedRisk()) {
         <div class="editor-card">
-          
+
           <!-- Top Meta Row -->
           <div class="editor-meta-row">
             <div class="meta-left">
@@ -90,7 +90,7 @@
 
           <!-- Fields Form -->
           <form [formGroup]="riskForm" class="editor-form">
-            
+
             <!-- Threat definition header -->
             <div class="form-header-row">
               <span class="section-divider-title">Threat Definition</span>
@@ -193,9 +193,9 @@
               </div>
             }
 
-            <!-- Risk Name / Likelihood -->
+            <!-- Risk Scoring -->
             <div class="section-divider-title">Risk Scoring (OWASP Likelihood &amp; Management)</div>
-            
+
             <div class="form-row likelihood-grid">
               <div class="form-field-group">
                 <label class="field-label">Skill Level (1-9)</label>
@@ -241,12 +241,38 @@
                 <span class="metric-label">INHERENT RISK</span>
                 <span class="metric-value cvss-score">{{ selectedRisk()?.inherentRiskScore || 5.0 }}</span>
               </div>
-              <div class="metric-box">
-                <span class="metric-label">RESIDUAL RISK</span>
-                <span class="metric-value residual-level" [style.color]="getSeverityColor(selectedRisk()?.residualRiskLevel)">
-                  {{ selectedRisk()?.residualRiskLevel || 'Low' }} ({{ selectedRisk()?.residualRiskScore || 5.0 }})
-                </span>
+            </div>
+
+            <!-- ── Residual Risk Section (now editable, bound to form) ── -->
+            <div class="section-divider-title">Residual Risk</div>
+
+            <div class="form-row">
+              <div class="form-field-group half">
+                <label class="field-label">Residual Risk Level</label>
+                <select formControlName="residualRiskLevel" class="form-select">
+                  @for (level of residualRiskLevels; track level) {
+                    <option [value]="level">{{ level }}</option>
+                  }
+                </select>
               </div>
+              <div class="form-field-group half">
+                <label class="field-label">Residual Risk Score (0–10)</label>
+                <input type="number" formControlName="residualRiskScore" class="form-input"
+                       min="0" max="10" step="0.1"
+                       placeholder="e.g. 3.5" />
+              </div>
+            </div>
+
+            <!-- Live residual summary pill -->
+            <div class="residual-summary-row">
+              <span class="residual-summary-label">Current residual risk:</span>
+              <span class="badge" [class]="'badge-' + getResidualClass(riskForm.get('residualRiskLevel')?.value)">
+                {{ riskForm.get('residualRiskLevel')?.value || 'Low' }}
+              </span>
+              <span class="residual-score-pill"
+                    [style.color]="getSeverityColor(riskForm.get('residualRiskLevel')?.value)">
+                Score: {{ riskForm.get('residualRiskScore')?.value ?? '—' }}
+              </span>
             </div>
 
           </form>

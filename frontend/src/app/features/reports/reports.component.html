@@ -1,15 +1,17 @@
 <div class="reports-container">
 
-  <!-- ── HEADER ROW ───────────────────────────────────────────────────────── -->
+  <!-- ── HEADER ROW ──────────────────────────────────────────────────────── -->
   <div class="header-row">
     <div class="header-left">
       <h1 class="page-title">ISRA report</h1>
       <p class="page-subtitle">
-        Generated security risk assessment for {{ activeProject()?.projectName || 'SecurePay Gateway' }} v{{ activeProject()?.projectVersion || '2.1' }}
+        Generated security risk assessment for
+        {{ activeProject()?.projectName || 'this project' }}
+        v{{ activeProject()?.projectVersion || '' }}
       </p>
     </div>
     <div class="header-right">
-      <button class="btn-outline-about">
+      <button class="btn-outline-about" (click)="openAbout()">
         <mat-icon class="btn-icon">info</mat-icon>
         <span>About this data</span>
       </button>
@@ -18,6 +20,19 @@
         <span>Export</span>
       </button>
       <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportPdf()">
+          <mat-icon>picture_as_pdf</mat-icon>
+          <span>Export PDF</span>
+        </button>
+        <button mat-menu-item (click)="exportWord()">
+          <mat-icon>description</mat-icon>
+          <span>Export Word</span>
+        </button>
+        <button mat-menu-item (click)="exportHtml()">
+          <mat-icon>html</mat-icon>
+          <span>Export HTML</span>
+        </button>
+        <mat-divider></mat-divider>
         <button mat-menu-item (click)="exportCsv()">
           <mat-icon>table_chart</mat-icon>
           <span>Risks CSV</span>
@@ -34,41 +49,43 @@
     </div>
   </div>
 
-  <!-- ── KPI CARDS ────────────────────────────────────────────────────────── -->
+  <!-- ── KPI CARDS ──────────────────────────────────────────────────────── -->
   <div class="kpi-row">
 
     <div class="kpi-card">
       <span class="kpi-label">TOTAL RISKS</span>
-      <span class="kpi-value">{{ totalRisks() || 10 }}</span>
+      <span class="kpi-value">{{ totalRisks() }}</span>
       <span class="kpi-sub">identified</span>
     </div>
 
     <div class="kpi-card">
       <span class="kpi-label">HIGH / CRITICAL</span>
-      <span class="kpi-value kpi-danger">{{ highAndCriticalCount() || 2 }}</span>
+      <span class="kpi-value kpi-danger">{{ highAndCriticalCount() }}</span>
       <span class="kpi-sub">residual</span>
     </div>
 
     <div class="kpi-card">
       <span class="kpi-label">AVG. RESIDUAL</span>
-      <span class="kpi-value kpi-safe">{{ (avgResidualRisk() || 0.38) | number:'1.2-2' }}</span>
+      <span class="kpi-value kpi-safe">{{ avgResidualRisk() | number:'1.2-2' }}</span>
       <span class="kpi-sub">score 0–1</span>
     </div>
 
     <div class="kpi-card">
       <span class="kpi-label">TO MITIGATE</span>
-      <span class="kpi-value kpi-accent">{{ toMitigateCount() || 6 }}</span>
-      <span class="kpi-sub">of {{ totalRisks() || 10 }} risks</span>
+      <span class="kpi-value kpi-accent">{{ mitigateCount() }}</span>
+      <span class="kpi-sub">of {{ totalRisks() }} risks</span>
     </div>
 
   </div>
 
-  <!-- ── CHART CARD ────────────────────────────────────────────────────────── -->
+  <!-- ── CHART CARD ──────────────────────────────────────────────────────── -->
   <div class="chart-card">
     <div class="chart-card-header">
       <div>
         <div class="chart-title">Project security risks</div>
-        <div class="chart-subtitle">Residual risk score by management decision. Each point is a risk; colour denotes residual risk level.</div>
+        <div class="chart-subtitle">
+          Residual risk score by management decision. Each point is a risk; colour denotes residual risk level.
+        </div>
       </div>
     </div>
 
@@ -76,9 +93,9 @@
 
       <!-- Y-axis labels -->
       <div class="y-axis">
-        @for (tick of [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]; track tick) {
-          <span class="y-tick">{{ tick | number:'1.1-1' }}</span>
-        }
+@for (tick of yAxisTicks; track tick) {
+  <span class="y-tick">{{ tick }}</span>
+}
       </div>
 
       <!-- Plot area -->
@@ -89,9 +106,9 @@
 
         <!-- Reference lines -->
         <div class="ref-line ref-line-danger" style="bottom: 67.5%"></div>
-        <div class="ref-line ref-line-safe" style="bottom: 32.5%"></div>
+        <div class="ref-line ref-line-safe"   style="bottom: 32.5%"></div>
 
-        <!-- Three decision columns -->
+        <!-- Decision columns -->
         <div class="decision-columns">
           @for (col of ['Accept', 'Transfer', 'Mitigate']; track col) {
             <div class="decision-col">
@@ -102,6 +119,9 @@
                      [title]="row.name + ' (' + row.id + ')'">
                   {{ row.id }}
                 </div>
+              }
+              @if (!getColumnRows(col).length) {
+                <div class="decision-col-empty">—</div>
               }
             </div>
           }
@@ -126,7 +146,7 @@
     </div>
   </div>
 
-  <!-- ── RISK REGISTER TABLE ──────────────────────────────────────────────── -->
+  <!-- ── RISK REGISTER TABLE ─────────────────────────────────────────────── -->
   <div class="table-card">
     <div class="table-card-header">Detailed risk register</div>
     <table class="risk-table">
@@ -161,10 +181,63 @@
               </span>
             </td>
           </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-state">No risks recorded for this project.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── VULNERABILITY REGISTER TABLE ───────────────────────────────────── -->
+  <div class="table-card">
+    <div class="table-card-header">Vulnerability register</div>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th class="col-desc">VULNERABILITY</th>
+          <th class="col-score">CVE ID</th>
+          <th class="col-score">FAMILY</th>
+          <th class="col-score">CVSS</th>
+          <th class="col-badge">SEVERITY</th>
+          <th class="col-badge">STATUS</th>
+          <th class="col-desc">ASSETS</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of vulnRows(); track row.id) {
+          <tr class="risk-row">
+            <td class="col-desc">
+              <div class="risk-name">{{ row.name }}</div>
+              @if (row.cve) {
+                <div class="risk-id">{{ row.cve }}</div>
+              }
+            </td>
+            <td class="col-score score-body muted">{{ row.cve || '—' }}</td>
+            <td class="col-score score-body">{{ row.family || '—' }}</td>
+            <td class="col-score score-body bold">{{ row.cvss | number:'1.1-1' }}</td>
+            <td class="col-badge">
+              <span class="pill" [ngClass]="'pill-level-' + getLevelClass(row.severity)">
+                {{ row.severity }}
+              </span>
+            </td>
+            <td class="col-badge">
+              <span class="pill pill-decision-accept">
+                {{ row.status }}
+              </span>
+            </td>
+            <td class="col-desc">
+              <small class="muted">{{ row.assets || '—' }}</small>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7" class="empty-state">No vulnerabilities recorded for this project.</td>
+          </tr>
         }
       </tbody>
     </table>
   </div>
 
 </div>
-

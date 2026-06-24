@@ -16,8 +16,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule } from '@angular/material/dialog';
 import { AiStatusService } from '../../core/services/ai-status.service';
 import { RiskAiService, ThreatSuggestion } from '../../core/services/risk-ai.service';
+import { AboutDataService } from '../../core/services/about-data.service';
 import { timeout, finalize } from 'rxjs/operators';
 
 @Component({
@@ -34,7 +36,8 @@ import { timeout, finalize } from 'rxjs/operators';
     MatCheckboxModule,
     MatSnackBarModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
   templateUrl: './risks.component.html',
   styleUrls: ['./risks.component.scss']
@@ -48,6 +51,7 @@ export class RisksComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private aiService = inject(AiStatusService);
   private riskAiService = inject(RiskAiService);
+  private aboutDataService = inject(AboutDataService);
   private validationService = inject(WizardValidationService);
   private _subs = new Subscription();
 
@@ -64,8 +68,8 @@ export class RisksComponent implements OnInit, OnDestroy {
   aiSuggestions = signal<ThreatSuggestion[]>([]);
   isLoadingSuggestions = signal<boolean>(false);
 
-  submitted = signal(false);     // form-level for selected risk editor
-  listSubmitted = signal(false); // true after Continue was clicked
+  submitted = signal(false);
+  listSubmitted = signal(false);
 
   riskForm: FormGroup;
   mitigationForm: FormGroup;
@@ -75,72 +79,7 @@ export class RisksComponent implements OnInit, OnDestroy {
   threatVerbs = ['steal', 'tamper with', 'deny access to', 'flood', 'spoof', 'repudiate', 'gain an unauthorized access to', 'disclose', 'lose'];
   managementDecisions = ['Avoid', 'Accept', 'Mitigate', 'Transfer', 'Discarded'];
   mitigationDecisions = ['Accepted', 'Done', 'Proposed'];
-
-  defaultRisks: Risk[] = [
-    {
-      id: 1,
-      riskId: 1,
-      riskName: 'SecurePay Gateway - Decrypt Cardholder Data',
-      threatAgent: 'External Attacker',
-      threatVerb: 'steal',
-      motivation: 'Steal payment credentials and cardholder info',
-      isAutomaticRiskName: true,
-      riskLikelihood: 6.8,
-      riskImpact: 8.0,
-      inherentRiskScore: 7.4,
-      residualRiskScore: 5.2,
-      residualRiskLevel: 'High',
-      riskManagementDecision: 'Mitigate',
-      businessAssetRef: { id: 1, assetName: 'Cardholder Data' } as any,
-      supportingAssetRef: { id: 1, assetName: 'Payment API' } as any,
-      riskAttackPaths: [
-        {
-          id: 1,
-          attackPathId: 1,
-          attackPathScore: 7.4,
-          vulnerabilityRefs: [
-            { id: 1, score: 7.4, name: 'Unpatched TLS 1.0 on payment API', vulnerability: { id: 1, vulnerabilityName: 'Unpatched TLS 1.0 on payment API', cveScore: 7.4 } as any }
-          ]
-        }
-      ],
-      riskMitigations: [
-        {
-          id: 1,
-          description: 'Enforce TLS 1.3 and disable legacy TLS versions',
-          benefits: 0.8,
-          decision: 'Done'
-        }
-      ]
-    },
-    {
-      id: 2,
-      riskId: 2,
-      riskName: 'Transaction DB - Exfiltrate Database',
-      threatAgent: 'External Attacker',
-      threatVerb: 'steal',
-      motivation: 'Query and download complete transaction histories',
-      isAutomaticRiskName: true,
-      riskLikelihood: 8.0,
-      riskImpact: 9.0,
-      inherentRiskScore: 8.5,
-      residualRiskScore: 8.5,
-      residualRiskLevel: 'Critical',
-      riskManagementDecision: 'Mitigate',
-      businessAssetRef: { id: 2, assetName: 'Transaction DB' } as any,
-      supportingAssetRef: { id: 2, assetName: 'Transaction Database' } as any,
-      riskAttackPaths: [
-        {
-          id: 2,
-          attackPathId: 2,
-          attackPathScore: 9.8,
-          vulnerabilityRefs: [
-            { id: 2, score: 9.8, name: 'SQL injection in transaction search', vulnerability: { id: 2, vulnerabilityName: 'SQL injection in transaction search', cveScore: 9.8 } as any }
-          ]
-        }
-      ],
-      riskMitigations: []
-    }
-  ];
+  residualRiskLevels = ['Low', 'Medium', 'Moderate', 'High', 'Critical'];
 
   constructor() {
     this.riskForm = this.fb.group({
@@ -152,7 +91,7 @@ export class RisksComponent implements OnInit, OnDestroy {
       businessAssetRefId: [null],
       supportingAssetRefId: [null],
       isAutomaticRiskName: [true],
-      riskName: [{ value: '', disabled: true }],
+      riskName: [''],
       isOwaspLikelihood: [true],
       skillLevel: [5],
       reward: [5],
@@ -160,9 +99,11 @@ export class RisksComponent implements OnInit, OnDestroy {
       size: [5],
       intrusionDetection: [5],
       occurrence: [5],
-      riskLikelihood: [{ value: null, disabled: true }],
+      riskLikelihood: [null],
       riskManagementDecision: ['Accept'],
-      riskManagementDetail: ['']
+      riskManagementDetail: [''],
+      residualRiskScore: [null],
+      residualRiskLevel: ['Low']
     });
 
     this.mitigationForm = this.fb.group({
@@ -172,6 +113,28 @@ export class RisksComponent implements OnInit, OnDestroy {
       decision: ['Proposed', Validators.required],
       decisionDetail: ['']
     });
+
+    // Sync enable/disable state for riskName based on isAutomaticRiskName
+    this.riskForm.get('isAutomaticRiskName')!.valueChanges.subscribe(isAuto => {
+      const ctrl = this.riskForm.get('riskName')!;
+      if (isAuto) {
+        ctrl.disable({ emitEvent: false });
+      } else {
+        ctrl.enable({ emitEvent: false });
+      }
+    });
+    this.riskForm.get('riskName')!.disable({ emitEvent: false });
+
+    // Sync enable/disable state for riskLikelihood based on isOwaspLikelihood
+    this.riskForm.get('isOwaspLikelihood')!.valueChanges.subscribe(isOwasp => {
+      const ctrl = this.riskForm.get('riskLikelihood')!;
+      if (isOwasp) {
+        ctrl.disable({ emitEvent: false });
+      } else {
+        ctrl.enable({ emitEvent: false });
+      }
+    });
+    this.riskForm.get('riskLikelihood')!.disable({ emitEvent: false });
   }
 
   ngOnInit(): void {
@@ -182,7 +145,6 @@ export class RisksComponent implements OnInit, OnDestroy {
           this.validationService.reportResult(false);
           return;
         }
-        // Validate the currently-open risk editor
         this.submitted.set(true);
         this.riskForm.markAllAsTouched();
         if (this.riskForm.invalid) {
@@ -194,15 +156,21 @@ export class RisksComponent implements OnInit, OnDestroy {
 
         const proj = this.activeProject();
         if (!proj?.id) {
-          // Demo mode — navigate without saving
           this.validationService.reportResult(true);
           return;
         }
 
-        // Apply current form values to the selected risk before building batch payload
+        // Apply form values to selectedRisk and flush back into the risks array
+        // so buildAllRisksPayload picks up the latest UI values (residualRiskScore,
+        // residualRiskLevel, inherentRiskScore, riskImpact, etc.)
         const selected = this.selectedRisk();
         if (selected) {
           this.applyFormToRisk(selected);
+
+          // ── FIX: sync the updated selectedRisk back into risks[] ──
+          this.risks.update(list =>
+            list.map(r => r.id === selected.id ? { ...selected } : r)
+          );
         }
 
         const payload = this.buildAllRisksPayload(proj.id);
@@ -217,6 +185,9 @@ export class RisksComponent implements OnInit, OnDestroy {
         ).subscribe({
           next: (updated) => {
             this.risks.set(updated);
+            const currentId = this.selectedRisk()?.id;
+            const fresh = updated.find(r => r.id === currentId);
+            if (fresh) this.selectedRisk.set(structuredClone(fresh));
             this.riskForm.markAsPristine();
             this.validationService.reportResult(true);
           },
@@ -233,7 +204,7 @@ export class RisksComponent implements OnInit, OnDestroy {
       const selected = this.selectedRisk();
       if (!selected) return;
 
-      // Keep AI suggestions in sync with edited context.
+      // Clear AI suggestions when form changes
       this.aiSuggestions.set([]);
 
       selected.threatAgent = val.threatAgent;
@@ -260,37 +231,45 @@ export class RisksComponent implements OnInit, OnDestroy {
 
       if (val.businessAssetRefId) {
         const found = this.businessAssets().find(b => b.id === val.businessAssetRefId);
-        selected.businessAssetRef = found ? found : { id: val.businessAssetRefId, assetName: 'Cardholder Data' } as any;
+        selected.businessAssetRef = found ? found : { id: val.businessAssetRefId } as any;
       }
       if (val.supportingAssetRefId) {
         const found = this.supportingAssets().find(s => s.id === val.supportingAssetRefId);
-        selected.supportingAssetRef = found ? found : { id: val.supportingAssetRefId, assetName: 'Payment API' } as any;
+        selected.supportingAssetRef = found ? found : { id: val.supportingAssetRefId } as any;
       }
+
+      // Sync residual fields back to selectedRisk
+      selected.residualRiskScore = val.residualRiskScore != null ? Number(val.residualRiskScore) : selected.residualRiskScore;
+      selected.residualRiskLevel = val.residualRiskLevel || selected.residualRiskLevel;
+
+      // ── FIX: also keep risks[] in sync on every form change so the
+      //    payload always has the latest values regardless of timing ──
+      const updatedRisk = { ...selected };
+      this.risks.update(list =>
+        list.map(r => r.id === updatedRisk.id ? updatedRisk : r)
+      );
+
+      // Trigger signal update so template re-renders
+      this.selectedRisk.set({ ...selected });
     });
   }
 
   loadAll() {
     const proj = this.activeProject();
     if (!proj?.id) {
-      this.risks.set(this.defaultRisks);
-      this.selectRisk(this.defaultRisks[0]);
+      this.risks.set([]);
       return;
     }
 
     this.riskService.getRisks(proj.id).subscribe({
       next: (r) => {
-        if (r && r.length > 0) {
-          this.risks.set(r);
-        } else {
-          this.risks.set(this.defaultRisks);
-        }
+        this.risks.set(r ?? []);
         if (this.risks().length > 0) {
           this.selectRisk(this.risks()[0]);
         }
       },
       error: () => {
-        this.risks.set(this.defaultRisks);
-        this.selectRisk(this.defaultRisks[0]);
+        this.risks.set([]);
       }
     });
 
@@ -300,8 +279,23 @@ export class RisksComponent implements OnInit, OnDestroy {
   }
 
   selectRisk(risk: Risk) {
-    this.selectedRisk.set(risk);
+    this.selectedRisk.set(structuredClone(risk));
     this.aiSuggestions.set([]);
+
+    const isAuto = risk.isAutomaticRiskName ?? true;
+    const isOwasp = risk.isOwaspLikelihood !== false;
+
+    if (isAuto) {
+      this.riskForm.get('riskName')!.disable({ emitEvent: false });
+    } else {
+      this.riskForm.get('riskName')!.enable({ emitEvent: false });
+    }
+    if (isOwasp) {
+      this.riskForm.get('riskLikelihood')!.disable({ emitEvent: false });
+    } else {
+      this.riskForm.get('riskLikelihood')!.enable({ emitEvent: false });
+    }
+
     this.riskForm.patchValue({
       threatAgent: risk.threatAgent || 'External Attacker',
       threatAgentDetail: risk.threatAgentDetail || '',
@@ -310,18 +304,20 @@ export class RisksComponent implements OnInit, OnDestroy {
       motivationDetail: risk.motivationDetail || '',
       businessAssetRefId: risk.businessAssetRef?.id || null,
       supportingAssetRefId: risk.supportingAssetRef?.id || null,
-      isAutomaticRiskName: risk.isAutomaticRiskName ?? true,
+      isAutomaticRiskName: isAuto,
       riskName: risk.riskName || '',
-      isOwaspLikelihood: risk.isOwaspLikelihood ?? true,
+      isOwaspLikelihood: isOwasp,
       skillLevel: risk.skillLevel ?? 5,
       reward: risk.reward ?? 5,
       accessResources: risk.accessResources ?? 5,
       size: risk.size ?? 5,
       intrusionDetection: risk.intrusionDetection ?? 5,
       occurrence: risk.occurrence ?? 5,
-      riskLikelihood: risk.riskLikelihood || null,
+      riskLikelihood: risk.riskLikelihood ?? null,
       riskManagementDecision: risk.riskManagementDecision || 'Accept',
-      riskManagementDetail: risk.riskManagementDetail || ''
+      riskManagementDetail: risk.riskManagementDetail || '',
+      residualRiskScore: risk.residualRiskScore ?? null,
+      residualRiskLevel: risk.residualRiskLevel || 'Low'
     }, { emitEvent: false });
   }
 
@@ -428,8 +424,8 @@ export class RisksComponent implements OnInit, OnDestroy {
     }
     this.riskService.addAttackPath(proj.id, riskId).subscribe({
       next: (updated) => {
-        this.risks.update(risks => risks.map(r => r.id === riskId ? updated : r));
-        this.selectedRisk.set(updated);
+        this.risks.update(risks => risks.map(r => r.id === riskId ? structuredClone(updated) : r));
+        this.selectedRisk.set(structuredClone(updated));
       }
     });
   }
@@ -440,14 +436,14 @@ export class RisksComponent implements OnInit, OnDestroy {
       const selected = this.selectedRisk();
       if (selected) {
         selected.riskAttackPaths = (selected.riskAttackPaths || []).filter(p => p.id !== pathId);
-        this.selectedRisk.set({ ...selected });
+        this.selectedRisk.set(structuredClone(selected));
       }
       return;
     }
     this.riskService.deleteAttackPath(proj.id, riskId, pathId).subscribe({
       next: (updated) => {
-        this.risks.update(risks => risks.map(r => r.id === riskId ? updated : r));
-        this.selectedRisk.set(updated);
+        this.risks.update(risks => risks.map(r => r.id === riskId ? structuredClone(updated) : r));
+        this.selectedRisk.set(structuredClone(updated));
       }
     });
   }
@@ -463,15 +459,15 @@ export class RisksComponent implements OnInit, OnDestroy {
         if (path) {
           path.vulnerabilityRefs = [...(path.vulnerabilityRefs || []), { id: vuln.id, name: vuln.vulnerabilityName, score: vuln.cveScore, vulnerability: vuln }];
           path.attackPathScore = Math.max(...(path.vulnerabilityRefs || []).map(r => r.score || 0));
-          this.selectedRisk.set({ ...selected });
+          this.selectedRisk.set(structuredClone(selected));
         }
       }
       return;
     }
     this.riskService.addVulnerabilityToAttackPath(proj.id, riskId, pathId, vulnId).subscribe({
       next: (updated) => {
-        this.risks.update(risks => risks.map(r => r.id === riskId ? updated : r));
-        this.selectedRisk.set(updated);
+        this.risks.update(risks => risks.map(r => r.id === riskId ? structuredClone(updated) : r));
+        this.selectedRisk.set(structuredClone(updated));
       }
     });
   }
@@ -485,15 +481,15 @@ export class RisksComponent implements OnInit, OnDestroy {
         if (path) {
           path.vulnerabilityRefs = (path.vulnerabilityRefs || []).filter(r => r.id !== refId);
           path.attackPathScore = path.vulnerabilityRefs.length > 0 ? Math.max(...path.vulnerabilityRefs.map(r => r.score || 0)) : 0;
-          this.selectedRisk.set({ ...selected });
+          this.selectedRisk.set(structuredClone(selected));
         }
       }
       return;
     }
     this.riskService.removeVulnerabilityFromAttackPath(proj.id, riskId, pathId, refId).subscribe({
       next: (updated) => {
-        this.risks.update(risks => risks.map(r => r.id === riskId ? updated : r));
-        this.selectedRisk.set(updated);
+        this.risks.update(risks => risks.map(r => r.id === riskId ? structuredClone(updated) : r));
+        this.selectedRisk.set(structuredClone(updated));
       }
     });
   }
@@ -538,16 +534,16 @@ export class RisksComponent implements OnInit, OnDestroy {
     if (state.mitId) {
       this.riskService.updateMitigation(proj.id, state.riskId, state.mitId, payload).subscribe({
         next: (updated) => {
-          this.risks.update(risks => risks.map(r => r.id === state.riskId ? updated : r));
-          this.selectedRisk.set(updated);
+          this.risks.update(risks => risks.map(r => r.id === state.riskId ? structuredClone(updated) : r));
+          this.selectedRisk.set(structuredClone(updated));
           this.editingMitigation.set(null);
         }
       });
     } else {
       this.riskService.addMitigation(proj.id, state.riskId, payload).subscribe({
         next: (updated) => {
-          this.risks.update(risks => risks.map(r => r.id === state.riskId ? updated : r));
-          this.selectedRisk.set(updated);
+          this.risks.update(risks => risks.map(r => r.id === state.riskId ? structuredClone(updated) : r));
+          this.selectedRisk.set(structuredClone(updated));
           this.editingMitigation.set(null);
         }
       });
@@ -566,8 +562,8 @@ export class RisksComponent implements OnInit, OnDestroy {
     }
     this.riskService.deleteMitigation(proj.id, riskId, mitId).subscribe({
       next: (updated) => {
-        this.risks.update(risks => risks.map(r => r.id === riskId ? updated : r));
-        this.selectedRisk.set(updated);
+        this.risks.update(risks => risks.map(r => r.id === riskId ? structuredClone(updated) : r));
+        this.selectedRisk.set(structuredClone(updated));
       }
     });
   }
@@ -601,6 +597,9 @@ export class RisksComponent implements OnInit, OnDestroy {
     if (val.supportingAssetRefId) {
       risk.supportingAssetRef = { id: val.supportingAssetRefId } as any;
     }
+    // Apply residual fields
+    risk.residualRiskScore = val.residualRiskScore != null ? Number(val.residualRiskScore) : risk.residualRiskScore;
+    risk.residualRiskLevel = val.residualRiskLevel || risk.residualRiskLevel;
   }
 
   private buildAllRisksPayload(projId: number): Risk[] {
@@ -609,7 +608,28 @@ export class RisksComponent implements OnInit, OnDestroy {
       .map(r => ({
         ...r,
         businessAssetRef: r.businessAssetRef?.id ? { id: r.businessAssetRef.id } : null,
-        supportingAssetRef: r.supportingAssetRef?.id ? { id: r.supportingAssetRef.id } : null
+        supportingAssetRef: r.supportingAssetRef?.id ? { id: r.supportingAssetRef.id } : null,
+        riskAttackPaths: (r.riskAttackPaths || []).map(path => ({
+          id: path.id,
+          attackPathId: path.attackPathId,
+          attackPathName: path.attackPathName,
+          attackPathScore: path.attackPathScore,
+          vulnerabilityRefs: (path.vulnerabilityRefs || []).map(ref => ({
+            id: ref.id,
+            score: ref.score,
+            name: ref.name,
+            vulnerability: ref.vulnerability?.id ? { id: ref.vulnerability.id } : undefined
+          }))
+        })),
+        riskMitigations: (r.riskMitigations || []).map(mit => ({
+          id: mit.id,
+          mitigationId: mit.mitigationId,
+          description: mit.description,
+          benefits: mit.benefits,
+          cost: mit.cost,
+          decision: mit.decision,
+          decisionDetail: mit.decisionDetail
+        }))
       } as Risk));
   }
 
@@ -617,10 +637,14 @@ export class RisksComponent implements OnInit, OnDestroy {
     this._subs.unsubscribe();
   }
 
+  openAbout(): void {
+    this.aboutDataService.open('risks');
+  }
+
   getBusinessAssetName(id: number | null): string {
     if (!id) return '';
     const found = this.businessAssets().find(b => b.id === id);
-    return found ? found.assetName : 'Cardholder Data';
+    return found ? found.assetName : '';
   }
 
   getResidualClass(level: string | undefined): string {
