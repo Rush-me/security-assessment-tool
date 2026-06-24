@@ -1,0 +1,303 @@
+<div class="vulnerabilities-container">
+
+  <!-- Empty-list validation banner -->
+  @if (listSubmitted() && vulnerabilities().length === 0) {
+    <div class="validation-banner">
+      <mat-icon>warning</mat-icon>
+      Add at least one vulnerability before continuing.
+    </div>
+  }
+
+  <!-- Header row -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Vulnerabilities</h1>
+      <p class="page-subtitle">
+        Link discovered vulnerabilities to risk scenarios and assess exploitability.
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+      <button class="btn-primary-add" (click)="onAddClick()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Vulnerability</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Two-column Split Layout -->
+  <div class="split-layout">
+
+    <!-- LEFT PANEL: Vulnerability Register -->
+    <div class="left-panel">
+      <div class="register-card">
+        <div class="register-header">
+          <span class="register-label">VULNERABILITY REGISTER</span>
+          <button class="btn-add-mini" (click)="onAddClick()">+ Add</button>
+        </div>
+
+        <div class="vulnerability-list">
+          @for (vuln of vulnerabilities(); track (vuln.id || vuln.vulnerabilityId)) {
+            <div class="vuln-item"
+                 [class.selected]="selectedVulnerability()?.id === vuln.id"
+                 (click)="selectVulnerability(vuln)">
+              <div class="vuln-item-main">
+                <div class="vuln-item-id">V-{{ (vuln.vulnerabilityId || vuln.id || 1) | number:'2.0-0' }}</div>
+                <h4 class="vuln-item-title">{{ vuln.vulnerabilityName }}</h4>
+                <div class="vuln-item-badges">
+                  <span class="badge" [class]="'badge-' + getSeverityClass(vuln.overallLevel)">
+                    {{ vuln.overallLevel || getExploitabilityLevel(vuln.cveScore) }}
+                  </span>
+                  <span class="status-badge" [class]="'status-' + getStatusClass(vuln.trackingId)">
+                    {{ vuln.trackingId || 'Open' }}
+                  </span>
+                </div>
+              </div>
+              <button class="btn-delete-item" type="button"
+                      (click)="onDeleteVulnerability(vuln.id!, $event)"
+                      title="Delete vulnerability">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Vulnerability Detail Editor -->
+    <div class="right-panel">
+      @if (selectedVulnerability()) {
+        <div class="editor-card">
+
+          <!-- Top Meta Row -->
+          <div class="editor-meta-row">
+            <div class="meta-left">
+              <span class="id-badge">V-{{ (selectedVulnerability()?.vulnerabilityId || selectedVulnerability()?.id || 1) | number:'2.0-0' }}</span>
+              <span class="badge" [class]="'badge-' + getSeverityClass(selectedVulnerability()?.overallLevel)">
+                {{ selectedVulnerability()?.overallLevel || getExploitabilityLevel(selectedVulnerability()?.cveScore) }}
+              </span>
+              <span class="status-badge" [class]="'status-' + getStatusClass(selectedVulnerability()?.trackingId)">
+                {{ selectedVulnerability()?.trackingId || 'Open' }}
+              </span>
+            </div>
+            <div class="meta-right">
+              Project v{{ activeProject()?.projectVersion || '2.1' }}
+            </div>
+          </div>
+
+          <!-- Fields Form -->
+          <form [formGroup]="vulnForm" class="editor-form">
+
+            <div class="form-header-row">
+                 <div class="form-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+              <span class="section-divider-title" style="margin:0; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em">Vulnerability Details</span>
+              <button type="button" class="btn-ai-suggest"
+                      [disabled]="aiState() !== 'available' || vulnForm.get('supportingAssets')?.value?.length === 0 || isLoadingSuggestions()"
+                      (click)="onSuggestVulnerabilities()">
+                @if (isLoadingSuggestions()) {
+                  <mat-spinner diameter="16" style="display:inline-block; margin-right:6px"></mat-spinner>
+                  <span>Generating...</span>
+                } @else {
+                  <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;margin-right:4px">auto_awesome</mat-icon>
+                  <span>Suggest Vulnerabilities</span>
+                }
+              </button>
+            </div>
+            </div>
+
+            <!-- 1. Vulnerability Title -->
+            <div class="form-field-group">
+              <label class="field-label" [class.label-invalid]="isFieldInvalid('vulnerabilityName')">Vulnerability title *</label>
+              <input type="text" formControlName="vulnerabilityName" class="form-input"
+                     [class.field-invalid]="isFieldInvalid('vulnerabilityName')"
+                     placeholder="e.g. Unpatched TLS 1.0 on payment API endpoint" />
+              @if (isFieldInvalid('vulnerabilityName')) {
+                <span class="field-error-msg">
+                  <mat-icon>warning</mat-icon>Vulnerability title is required
+                </span>
+              }
+            </div>
+
+            <!-- 2. Family / Category & Tracking Status -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label class="field-label" [class.label-invalid]="isFieldInvalid('vulnerabilityFamily')">Family / Category *</label>
+                <mat-form-field appearance="outline" class="full-width-select">
+                  <mat-select formControlName="vulnerabilityFamily" placeholder="Select family...">
+                    @for (family of vulnFamilies; track family) {
+                      <mat-option [value]="family">{{ family }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+                @if (isFieldInvalid('vulnerabilityFamily')) {
+                  <span class="field-error-msg">
+                    <mat-icon>warning</mat-icon>Category is required
+                  </span>
+                }
+              </div>
+              <div class="form-field-group">
+                <label class="field-label" [class.label-invalid]="isFieldInvalid('trackingId')">Tracking status *</label>
+                <mat-form-field appearance="outline" class="full-width-select">
+                  <mat-select formControlName="trackingId" placeholder="Select status...">
+                    <mat-option value="Open">Open</mat-option>
+                    <mat-option value="Mitigated">Mitigated</mat-option>
+                    <mat-option value="Accepted">Accepted</mat-option>
+                    <mat-option value="Discarded">Discarded</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                @if (isFieldInvalid('trackingId')) {
+                  <span class="field-error-msg">
+                    <mat-icon>warning</mat-icon>Status is required
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- 3. CVSS Score & CVE ID -->
+            <div class="form-row-2col">
+              <div class="form-field-group">
+                <label class="field-label" [class.label-invalid]="isFieldInvalid('cveScore')">CVSS Score (0–10) *</label>
+                <input type="number" formControlName="cveScore" class="form-input"
+                       [class.field-invalid]="isFieldInvalid('cveScore')"
+                       min="0" max="10" step="0.1" placeholder="e.g. 7.4" />
+                @if (isFieldInvalid('cveScore')) {
+                  <span class="field-error-msg">
+                    <mat-icon>warning</mat-icon>CVSS score (0–10) is required
+                  </span>
+                }
+              </div>
+              <div class="form-field-group">
+                <label class="field-label">CVE Identifier</label>
+                <input type="text" formControlName="cve" class="form-input"
+                       placeholder="e.g. CVE-2023-12345" />
+              </div>
+            </div>
+
+            <!-- 4. Tracking / Defect URI -->
+            <div class="form-field-group">
+              <label class="field-label">Tracking / Defect URI</label>
+              <input type="url" formControlName="trackingUri" class="form-input"
+                     placeholder="https://jira.example.com/browse/SEC-123" />
+            </div>
+
+            <!-- 5. Description -->
+            <div class="form-field-group">
+              <label class="field-label">Description</label>
+              <textarea formControlName="vulnerabilityDescription" class="form-textarea"
+                        placeholder="TLS 1.0 is enabled on the endpoint, allowing attacks..."></textarea>
+            </div>
+
+            <!-- 3. Affected Supporting Assets -->
+            <div class="form-field-group">
+              <label class="field-label" [class.label-invalid]="isAssetsInvalid()">Affected supporting assets *</label>
+              <mat-form-field appearance="outline" class="full-width-select" [class.mat-field-assets-invalid]="isAssetsInvalid()">
+                <mat-select formControlName="supportingAssets" multiple placeholder="Select assets...">
+                  @for (asset of supportingAssets(); track asset.id) {
+                    <mat-option [value]="asset.id">{{ asset.assetName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <!-- Selected asset tags -->
+              @if (vulnForm.get('supportingAssets')?.value?.length > 0) {
+                <div class="tags-container" [class.field-invalid]="isAssetsInvalid()">
+                  @for (assetId of vulnForm.get('supportingAssets')?.value; track assetId) {
+                    <div class="tag">
+                      <span>{{ getAssetName(assetId) }}</span>
+                      <button type="button" class="tag-close-btn" (click)="removeAsset(assetId)">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+              @if (isAssetsInvalid()) {
+                <span class="field-error-msg">
+                  <mat-icon>warning</mat-icon>Select at least one supporting asset
+                </span>
+              }
+            </div>
+
+            <!-- AI Suggestions Panel -->
+            @if (aiSuggestions().length > 0 || isLoadingSuggestions()) {
+              <div class="ai-suggestions-box">
+                <div class="ai-title">
+                  <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px">auto_awesome</mat-icon>
+                  <span>AI Vulnerability Suggestions</span>
+                </div>
+                @if (isLoadingSuggestions()) {
+                  <div class="ai-loading-text">Analyzing asset threat vectors...</div>
+                } @else {
+                  <div class="sug-list">
+                    @for (sug of aiSuggestions(); track sug.rationale) {
+                      <div class="sug-item">
+                        <div class="sug-item-content">
+                          <strong class="sug-name">{{ sug.vulnerabilityName }}</strong>
+                          <div class="sug-meta">{{ sug.vulnerabilityFamily }} · CVSS: {{ sug.estimatedCveScore }}</div>
+                          <div class="sug-desc">{{ sug.vulnerabilityDescription }}</div>
+                          <div class="sug-rationale"><em>{{ sug.rationale }}</em></div>
+                        </div>
+                        <button type="button" class="btn-use-sug" (click)="useSuggestion(sug)">Use</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- 4. Four Metric Boxes in 2x2 Grid -->
+            <div class="metrics-grid">
+
+              <!-- Box 1: Exploitability -->
+              <div class="metric-box">
+                <span class="metric-label">EXPLOITABILITY</span>
+                <span class="metric-value exploitability"
+                      [style.color]="getSeverityColor(selectedVulnerability()?.overallLevel || getExploitabilityLevel(selectedVulnerability()?.cveScore))">
+                  {{ selectedVulnerability()?.overallLevel || getExploitabilityLevel(selectedVulnerability()?.cveScore) }}
+                </span>
+              </div>
+
+              <!-- Box 2: CVSS Score -->
+              <div class="metric-box">
+                <span class="metric-label">CVSS SCORE</span>
+                <span class="metric-value cvss-score">
+                  {{ vulnForm.get('cveScore')?.value | number:'1.1-1' }}
+                </span>
+              </div>
+
+              <!-- Box 3: Status -->
+              <div class="metric-box">
+                <span class="metric-label">STATUS</span>
+                <span class="metric-value status-text">
+                  {{ selectedVulnerability()?.trackingId || 'Open' }}
+                </span>
+              </div>
+
+              <!-- Box 4: Affected Asset -->
+              <div class="metric-box">
+                <span class="metric-label">AFFECTED ASSET</span>
+                <span class="metric-value affected-asset">
+                  {{ getAffectedAssetName() }}
+                </span>
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+      } @else {
+        <div class="empty-editor-state">
+          <mat-icon>bug_report</mat-icon>
+          <h3>No vulnerability selected</h3>
+          <p>Select a vulnerability from the register to view and edit details.</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,176 @@
+<div class="supporting-assets-container">
+
+  <!-- Header row -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Supporting Assets</h1>
+      <p class="page-subtitle">
+        Technical infrastructure mapping to hosted business assets.
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+      <button class="btn-primary-add" (click)="onAddAssetClick()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Asset</span>
+      </button>
+    </div>
+  </div>
+
+  @if (listSubmitted() && assets().length === 0) {
+    <div class="validation-banner">
+      <mat-icon>warning</mat-icon>
+      Add at least one supporting asset before continuing.
+    </div>
+  }
+
+  <!-- Add / Edit form card -->
+  @if (showForm()) {
+    <div class="editor-card" style="margin-bottom:16px">
+      <div class="card-section-header">
+        <span class="section-title">{{ editMode() ? 'Edit Asset' : 'New Supporting Asset' }}</span>
+        <button type="button" class="btn-close-card" (click)="showForm.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="assetForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-row-3col">
+          <div class="form-field-group">
+            <label class="field-label">HLD ID</label>
+            <input type="text" formControlName="hldId" class="form-input" placeholder="e.g. SA.01" />
+          </div>
+          <div class="form-field-group" style="grid-column: span 2">
+            <label class="field-label">Asset name *</label>
+            <input type="text" formControlName="assetName" class="form-input"
+                   [class.field-invalid]="assetForm.get('assetName')?.invalid && assetForm.get('assetName')?.touched"
+                   placeholder="e.g. Authentication API Gateway" />
+            @if (assetForm.get('assetName')?.hasError('required') && assetForm.get('assetName')?.touched) {
+              <span class="field-error-msg"><mat-icon>warning</mat-icon>Asset name is required</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-row-2col" style="margin-top:12px">
+          <div class="form-field-group">
+            <label class="field-label">Asset type</label>
+            <mat-form-field appearance="outline" class="full-width-select">
+              <mat-select formControlName="assetType" placeholder="Select type...">
+                @for (type of assetTypes; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="form-field-group">
+            <label class="field-label">Security level</label>
+            <mat-form-field appearance="outline" class="full-width-select">
+              <mat-select formControlName="securityLevel" placeholder="Select level...">
+                @for (lvl of securityLevels; track lvl.value) {
+                  <mat-option [value]="lvl.value">{{ lvl.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-field-group" style="margin-top:12px">
+          <label class="field-label">Linked business assets</label>
+          <mat-form-field appearance="outline" class="full-width-select">
+            <mat-select formControlName="businessAssets" multiple placeholder="Select business assets...">
+              @for (ba of businessAssets(); track ba.id) {
+                <mat-option [value]="ba.id">{{ ba.assetName }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <span class="field-hint-text">Choose which business assets are processed on this infrastructure component</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="showForm.set(false)">Cancel</button>
+          <button type="submit" class="btn-save" [disabled]="assetForm.invalid">
+            {{ editMode() ? 'Update Asset' : 'Save Asset' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Assets table -->
+  @if (!showForm() && assets().length > 0) {
+    <div class="table-card">
+      <table mat-table [dataSource]="assets()" class="assets-table">
+
+        <ng-container matColumnDef="assetId">
+          <th mat-header-cell *matHeaderCellDef>ID</th>
+          <td mat-cell *matCellDef="let el">
+            <span class="asset-id-badge">SA-{{ el.assetId }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="hldId">
+          <th mat-header-cell *matHeaderCellDef>HLD REF</th>
+          <td mat-cell *matCellDef="let el">{{ el.hldId || '–' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="assetName">
+          <th mat-header-cell *matHeaderCellDef>ASSET NAME</th>
+          <td mat-cell *matCellDef="let el">
+            <strong>{{ el.assetName }}</strong>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="assetType">
+          <th mat-header-cell *matHeaderCellDef>TYPE</th>
+          <td mat-cell *matCellDef="let el">{{ el.assetType }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="securityLevel">
+          <th mat-header-cell *matHeaderCellDef>SECURITY LEVEL</th>
+          <td mat-cell *matCellDef="let el">
+            <span class="sl-badge">SL{{ el.securityLevel }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="businessAssets">
+          <th mat-header-cell *matHeaderCellDef>LINKED BUSINESS ASSETS</th>
+          <td mat-cell *matCellDef="let el" class="linked-assets-cell">
+            {{ getBusinessAssetNames(el.businessAssets) || '–' }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let el">
+            <button class="btn-row-delete" type="button"
+                    (click)="onDeleteAsset(el.id!); $event.stopPropagation()"
+                    title="Delete asset">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="table-row" (click)="onEditAsset(row)"></tr>
+      </table>
+    </div>
+  }
+
+  @if (!showForm() && assets().length === 0) {
+    <div class="empty-state">
+      <mat-icon>layers</mat-icon>
+      <h3>No supporting assets yet</h3>
+      <p>Add technical systems that host or process your business assets.</p>
+      <button class="btn-primary-add" (click)="onAddAssetClick()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Asset</span>
+      </button>
+    </div>
+  }
+
+</div>

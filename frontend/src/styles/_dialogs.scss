@@ -1,0 +1,113 @@
+@use 'variables' as *;
+
+// ============================================================
+// MATERIAL DIALOG - ISRA LIGHT THEME
+// ============================================================
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: var(--bg-surface);
+  border-radius: 12px !important;
+  overflow: hidden;
+}
+
+.mdc-dialog__surface {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16) !important;
+}
+
+.mat-mdc-dialog-surface {
+  padding: 0 !important;
+}
+
+// Standard ISRA dialog layout
+.isra-dialog {
+  display: flex;
+  flex-direction: column;
+  min-width: 420px;
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+
+    .dialog-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+  }
+
+  .dialog-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    max-height: 60vh;
+  }
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+}
+
+// Cancel / Confirm button styles inside dialogs
+.btn-dialog-cancel {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+
+  &:hover { background: var(--bg-surface-2) !important; }
+}
+
+.btn-dialog-confirm {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+
+  &:hover { background: var(--accent-hover) !important; }
+}
+
+// About info dialog
+.info-dialog {
+  .info-step-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .info-section {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+
+    &:first-of-type { border-top: none; padding-top: 0; }
+
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}

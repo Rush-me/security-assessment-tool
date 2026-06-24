@@ -1,0 +1,13 @@
+// Centralized design system uses
+@use 'material-icons/iconfont/material-icons.scss';
+@use 'variables';
+@use 'mixins';
+@use 'theme';
+@use 'layout';
+@use 'tables';
+@use 'forms';
+@use 'dialogs';
+
+// Self-hosted fonts (offline capable imports after @use)
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';

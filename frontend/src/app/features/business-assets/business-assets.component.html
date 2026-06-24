@@ -1,0 +1,167 @@
+<div class="business-assets-container">
+
+  <!-- Header row -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Business Assets</h1>
+      <p class="page-subtitle">
+        Rate each security property. Click a value in the table to cycle None → Low → Moderate → High.
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+      <button class="btn-primary-add" (click)="onAddAssetClick()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Asset</span>
+      </button>
+    </div>
+  </div>
+
+  @if (listSubmitted() && assets().length === 0) {
+    <div class="validation-banner">
+      <mat-icon>warning</mat-icon>
+      Add at least one business asset before continuing.
+    </div>
+  }
+
+  <!-- Add / Edit form card -->
+  @if (showForm()) {
+    <div class="editor-card" style="margin-bottom:16px">
+      <div class="card-section-header">
+        <span class="section-title">{{ editMode() ? 'Edit Asset' : 'New Business Asset' }}</span>
+        <button type="button" class="btn-close-card" (click)="showForm.set(false)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="assetForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-row-2col">
+          <div class="form-field-group">
+            <label class="field-label">Asset name *</label>
+            <input type="text" formControlName="assetName" class="form-input"
+                   [class.field-invalid]="assetForm.get('assetName')?.invalid && assetForm.get('assetName')?.touched"
+                   placeholder="e.g. Cardholder Data (PAN)" />
+            @if (assetForm.get('assetName')?.hasError('required') && assetForm.get('assetName')?.touched) {
+              <span class="field-error-msg"><mat-icon>warning</mat-icon>Asset name is required</span>
+            }
+          </div>
+          <div class="form-field-group">
+            <label class="field-label">Asset type</label>
+            <mat-form-field appearance="outline" class="full-width-select">
+              <mat-select formControlName="assetType" placeholder="Select type...">
+                @for (type of assetTypes; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-field-group" style="margin-top:12px">
+          <label class="field-label">Description</label>
+          <textarea formControlName="assetDescription" class="form-textarea" rows="2"
+                    placeholder="Purpose, scope and criticality..."></textarea>
+        </div>
+
+        <div class="ratings-section">
+          <label class="field-label" style="margin-bottom:10px;display:block">Security property ratings</label>
+          <div class="ratings-row">
+            @for (prop of ratingProps; track prop.key) {
+              <div class="rating-field">
+                <label class="rating-label">{{ prop.label }}</label>
+                <mat-form-field appearance="outline" class="rating-select">
+                  <mat-select [formControlName]="prop.key">
+                    @for (r of ratingValues; track r.value) {
+                      <mat-option [value]="r.value">{{ r.label }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="showForm.set(false)">Cancel</button>
+          <button type="submit" class="btn-save" [disabled]="assetForm.invalid">
+            {{ editMode() ? 'Update Asset' : 'Save Asset' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+
+  <!-- Assets table -->
+  @if (!showForm() && assets().length > 0) {
+    <div class="table-card">
+      <table mat-table [dataSource]="assets()" class="assets-table">
+
+        <ng-container matColumnDef="assetName">
+          <th mat-header-cell *matHeaderCellDef>ASSET</th>
+          <td mat-cell *matCellDef="let el">
+            <div class="asset-name-cell">
+              <strong>{{ el.assetName }}</strong>
+              <span class="asset-id-label">BA-{{ el.assetId }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="assetType">
+          <th mat-header-cell *matHeaderCellDef>TYPE</th>
+          <td mat-cell *matCellDef="let el">{{ el.assetType }}</td>
+        </ng-container>
+
+        @for (col of ratingColumns; track col.key) {
+          <ng-container [matColumnDef]="col.key">
+            <th mat-header-cell *matHeaderCellDef>{{ col.label }}</th>
+            <td mat-cell *matCellDef="let el">
+              <span class="rating-badge clickable" [class]="'rating-' + getRatingLabel(el[col.key])"
+                    (click)="cycleRating(el, col.key)">
+                {{ getRatingLabel(el[col.key]) | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+        }
+
+        <ng-container matColumnDef="assetDescription">
+          <th mat-header-cell *matHeaderCellDef>DESCRIPTION</th>
+          <td mat-cell *matCellDef="let el" class="description-cell">
+            {{ el.assetDescription }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let el">
+            <button class="btn-row-delete" type="button"
+                    (click)="onDeleteAsset(el.id!); $event.stopPropagation()"
+                    title="Delete asset">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="table-row" (click)="onEditAsset(row)"></tr>
+      </table>
+    </div>
+  }
+
+  @if (!showForm() && assets().length === 0) {
+    <div class="empty-state">
+      <mat-icon>business</mat-icon>
+      <h3>No business assets yet</h3>
+      <p>Add the first asset to begin rating security properties.</p>
+      <button class="btn-primary-add" (click)="onAddAssetClick()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Asset</span>
+      </button>
+    </div>
+  }
+
+</div>

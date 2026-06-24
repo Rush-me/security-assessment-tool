@@ -1,0 +1,78 @@
+<div class="basic-info-container">
+
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Basic Info</h1>
+      <p class="page-subtitle">Project identification and classification for this security assessment.</p>
+    </div>
+  </div>
+
+  @if (submitted() && basicForm.invalid) {
+    <div class="validation-banner">
+      <mat-icon>warning</mat-icon>
+      Please fill in all required fields before continuing.
+    </div>
+  }
+
+  <div class="info-card">
+    <div class="info-card-title">Project Details</div>
+    <form [formGroup]="basicForm" class="editor-form">
+
+      <div class="form-row">
+        <div class="form-field-group half">
+          <label class="field-label" [class.label-invalid]="isFieldInvalid('projectName')">PROJECT NAME *</label>
+          <input type="text" formControlName="projectName" class="form-input"
+                 [class.field-invalid]="isFieldInvalid('projectName')"
+                 placeholder="e.g. SecurePay Gateway" />
+          @if (isFieldInvalid('projectName')) {
+            <span class="field-error-msg">
+              <mat-icon>warning</mat-icon>Project name is required
+            </span>
+          }
+        </div>
+        <div class="form-field-group half">
+          <label class="field-label" [class.label-invalid]="isFieldInvalid('projectVersion')">VERSION *</label>
+          <input type="text" formControlName="projectVersion" class="form-input"
+                 [class.field-invalid]="isFieldInvalid('projectVersion')"
+                 placeholder="e.g. 2.1" />
+          @if (isFieldInvalid('projectVersion')) {
+            <span class="field-error-msg">
+              <mat-icon>warning</mat-icon>Version is required
+            </span>
+          }
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:16px">
+        <div class="form-field-group half">
+          <label class="field-label" [class.label-invalid]="isFieldInvalid('projectOrganization')">ORGANIZATION *</label>
+          <input type="text" formControlName="projectOrganization" class="form-input"
+                 [class.field-invalid]="isFieldInvalid('projectOrganization')"
+                 placeholder="e.g. Payments &amp; Fintech" />
+          @if (isFieldInvalid('projectOrganization')) {
+            <span class="field-error-msg">
+              <mat-icon>warning</mat-icon>Organization is required
+            </span>
+          }
+        </div>
+        <div class="form-field-group half">
+          <label class="field-label" [class.label-invalid]="isFieldInvalid('classification')">CLASSIFICATION *</label>
+          <select formControlName="classification" class="form-select"
+                  [class.field-invalid]="isFieldInvalid('classification')">
+            <option value="">— Select —</option>
+            @for (c of classifications; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('classification')) {
+            <span class="field-error-msg">
+              <mat-icon>warning</mat-icon>Please select a classification level
+            </span>
+          }
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+</div>
