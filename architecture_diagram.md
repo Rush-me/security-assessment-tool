@@ -65,7 +65,7 @@ graph TD
   * `Import` (`app/src/tabs/Import/`): Uploads and translates legacy assessment templates.
 
 ### B. IPC Bridge Layer
-* **Location**: [app/src/electron/preload.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/electron/preload.js)
+* **Location**: `app/src/electron/preload.js`
 * **Description**: A security-enforced layer that prevents direct access to Node.js APIs from the renderer's browser window. It registers designated channels in `contextBridge.exposeInMainWorld()`.
 * **Exposed Context Objects**:
   * `window.project`: Handles loading events and tracking revisions.
