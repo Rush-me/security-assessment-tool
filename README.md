@@ -245,10 +245,10 @@ ISRA calculates three scores per risk scenario automatically:
 
 | Level | Score Range |
 |---|---|
-| Low | 0.00 – 0.24 |
-| Medium | 0.25 – 0.49 |
-| High | 0.50 – 0.74 |
-| Critical | 0.75 – 1.00 |
+| Low | ≤ 5 |
+| Medium | > 5 – 10 |
+| High | > 10 – 15 |
+| Critical | > 15 |
 
 ---
 
