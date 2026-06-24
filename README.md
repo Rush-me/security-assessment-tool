@@ -143,13 +143,13 @@ What happens automatically:
 
 ```bash
 # 1. Build the Spring Boot JAR
-cd backend && mvn clean package -DskipTests
+(cd backend && mvn clean package -DskipTests)
 
 # 2. Build Angular for production
-cd frontend && ng build --configuration production
+(cd frontend && ng build --configuration production)
 
 # 3. Download a bundled JRE (so end users don't need Java installed)
-cd electron && npm run download-jre
+(cd electron && npm run download-jre)
 
 # 4. Package for your platform
 npm run dist:linux    # produces .AppImage and .deb
