@@ -1,0 +1,76 @@
+name: Electron E2E
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  e2e:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: generated/playwright-electron-framework/package-lock.json
+
+      - name: Install framework dependencies
+        working-directory: generated/playwright-electron-framework
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: generated/playwright-electron-framework
+        run: npx playwright install
+
+      - name: Run smoke tests
+        working-directory: generated/playwright-electron-framework
+        run: npm run test:smoke
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-report
+          path: generated/playwright-electron-framework/reports/junit.xml
+
+      - name: Upload cucumber report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json
+          path: generated/playwright-electron-framework/reports/cucumber-report.json
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: generated/playwright-electron-framework/screenshots
+
+      - name: Upload videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: generated/playwright-electron-framework/videos
+
+      - name: Upload traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traces
+          path: generated/playwright-electron-framework/traces
+
+      - name: Upload healing reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: healing-reports
+          path: generated/playwright-electron-framework/reports/healing-report.json

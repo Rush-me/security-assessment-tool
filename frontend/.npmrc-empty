@@ -1,0 +1,2 @@
+# Empty npm config to bypass corporate/global registry authentication errors
+registry=https://registry.npmjs.org/

@@ -1,0 +1,30 @@
+{
+  "name": "isra-playwright-electron-framework",
+  "version": "1.0.0",
+  "description": "Playwright Electron + Cucumber automation framework for ISRA 2.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node TestRunner/TestRunner.js",
+    "test:smoke": "node TestRunner/TestRunner.js --profile smoke",
+    "test:sanity": "node TestRunner/TestRunner.js --profile sanity",
+    "test:regression": "node TestRunner/TestRunner.js --profile regression",
+    "test:p0": "node TestRunner/TestRunner.js --profile p0",
+    "test:p1": "node TestRunner/TestRunner.js --profile p1",
+    "test:parallel": "node TestRunner/TestRunner.js --parallel 2",
+    "posttest": "node utils/ExecutionSummary.js"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^11.0.1",
+    "@playwright/test": "^1.49.1",
+    "axios": "^1.7.7",
+    "csv-parse": "^5.5.6",
+    "dotenv": "^16.4.5",
+    "form-data": "^4.0.1",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "electron": "^31.7.7",
+    "multiple-cucumber-html-reporter": "^3.8.0"
+  }
+}
