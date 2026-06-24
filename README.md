@@ -206,7 +206,7 @@ features/
 core/
 ├── services/           API clients (project, risk, asset, AI status…)
 ├── guards/             Auth route guard
-└── interceptors/       JWT token injection
+└── interceptors/       `X-Username` header injection (no JWT)
 ```
 
 ---
