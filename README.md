@@ -372,4 +372,4 @@ Developed by the Thales Group  engineering team as part of an internal hackathon
 
 ## License
 
-Internal use only. See `LICENSE` for terms.
+Internal use only.
