@@ -51,7 +51,7 @@ security-assessment-tool/
 └────────────────────────────────────────┘
 ```
 
-All data is stored **locally on the user's machine**. Nothing leaves the device without an explicit export action.
+All assessment data is stored **locally on the user's machine**. If AI integration is enabled, selected context is sent to the Gemini API to generate threat/vulnerability suggestions.
 
 ---
 
