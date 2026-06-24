@@ -132,7 +132,7 @@ async function showUserGuideSaveDialog() {
   }
 
   try {
-    fs.copyFileSync(userGuidePath, filePath);
+    await fs.promises.copyFile(userGuidePath, filePath);
     const result = await shell.openPath(filePath);
     if (result) {
       log.warn(`Unable to open saved user guide: ${result}`);
