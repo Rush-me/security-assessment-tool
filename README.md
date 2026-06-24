@@ -321,7 +321,7 @@ isra.ai.base-url=https://generativelanguage.googleapis.com
 ---
 
 ## Logs
-
+On Linux this is `~/.config/SecurityRiskAssessmentTool/logs/`. On macOS/Windows, replace `~/.config` with Electron's `appData` directory (typically `~/Library/Application Support` or `%APPDATA%`).
 ```
 ~/.config/SecurityRiskAssessmentTool/logs/
 ├── electron.log    Port allocation, backend spawn, window lifecycle
