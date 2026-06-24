@@ -182,8 +182,21 @@ function pollBackend(port, retries, delayMs) {
     let remaining = retries;
     function attempt() {
       http.get(`http://127.0.0.1:${port}/api/projects`, (res) => {
-        log.info(`Backend health check: HTTP ${res.statusCode}`);
-        resolve();
+        const ok = res.statusCode && res.statusCode >= 200 && res.statusCode < 300;
+        res.resume(); // drain so the socket can close / be reused
+
+        if (ok) {
+          log.info(`Backend health check: HTTP ${res.statusCode}`);
+          resolve();
+          return;
+        }
+
+        remaining--;
+        if (remaining <= 0) {
+          reject(new Error(`Backend did not become available after ${retries} attempts.`));
+        } else {
+          setTimeout(attempt, delayMs);
+        }
       }).on('error', () => {
         remaining--;
         if (remaining <= 0) {
