@@ -47,22 +47,22 @@ graph TD
 ## 2. Layer Analysis
 
 ### A. Presentation Layer (Renderer Process)
-* **Location**: [app/src/tabs/](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs)
-* **Description**: Houses the web views for the application's tabs corresponding to ISO 27005 steps. It performs lightweight visual styling using vanilla CSS and local Javascript logic.
+* **Location**: `app/src/tabs/`
+* **Description**: Houses the web views for the application's tabs corresponding to ISO 27005 steps. It performs lightweight visual styling using vanilla CSS and local JavaScript logic.
 * **Core Libraries**:
   * **jQuery**: Used for DOM selections, event binding, and DOM manipulation.
   * **Tabulator-Tables**: Manages tabular spreadsheets, cell editors, grid data representation, and row/column mutations (e.g. for listing assets, vulnerability lists, tracking, and risks).
   * **TinyMCE**: Powers HTML rich-text rendering for description/documentation blocks.
   * **Chart.js**: Generates the final risk assessment charts in the Report tab.
 * **Component tabs**:
-  * [Welcome](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Welcome): Renders tracking history records and coordinates application-wide settings.
-  * [Project Context](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Project%20Context): Captures the scope of assessments, attachments (diagrams, text files), and reference URLs.
-  * [Business Assets](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Business%20Assets): Manages high-level primary assets with security quality indicators.
-  * [Supporting Assets](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Supporting%20Assets): Connects physical/logical technical systems to Business Assets.
-  * [Vulnerabilities](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Vulnerabilities): Manages vulnerabilities list, scores (0-10), and mappings to supporting assets.
-  * [Risks](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Risks): Chains Threat Agents -> Threat Verbs -> Supporting Assets -> Business Assets with custom combinations of Vulnerability Attack Paths (incident scenarios).
-  * [Report](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Report): Compiles findings, builds visualizations, and enables HTML/PDF export.
-  * [Import](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/tabs/Import): Uploads and translates legacy assessment templates.
+  * `Welcome` (`app/src/tabs/Welcome/`): Renders tracking history records and coordinates application-wide settings.
+  * `Project Context` (`app/src/tabs/Project Context/`): Captures the scope of assessments, attachments (diagrams, text files), and reference URLs.
+  * `Business Assets` (`app/src/tabs/Business Assets/`): Manages high-level primary assets with security quality indicators.
+  * `Supporting Assets` (`app/src/tabs/Supporting Assets/`): Connects physical/logical technical systems to Business Assets.
+  * `Vulnerabilities` (`app/src/tabs/Vulnerabilities/`): Manages vulnerabilities list, scores (0-10), and mappings to supporting assets.
+  * `Risks` (`app/src/tabs/Risks/`): Chains Threat Agents -> Threat Verbs -> Supporting Assets -> Business Assets with custom combinations of Vulnerability Attack Paths (incident scenarios).
+  * `Report` (`app/src/tabs/Report/`): Compiles findings, builds visualizations, and enables HTML/PDF export.
+  * `Import` (`app/src/tabs/Import/`): Uploads and translates legacy assessment templates.
 
 ### B. IPC Bridge Layer
 * **Location**: [app/src/electron/preload.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/electron/preload.js)
