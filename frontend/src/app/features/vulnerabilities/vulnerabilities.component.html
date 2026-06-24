@@ -91,8 +91,7 @@
           <!-- Fields Form -->
           <form [formGroup]="vulnForm" class="editor-form">
 
-            <div class="form-header-row">
-                 <div class="form-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+            <div class="form-header-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
               <span class="section-divider-title" style="margin:0; font-size:12px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em">Vulnerability Details</span>
               <button type="button" class="btn-ai-suggest"
                       [disabled]="aiState() !== 'available' || vulnForm.get('supportingAssets')?.value?.length === 0 || isLoadingSuggestions()"
@@ -106,8 +105,6 @@
                 }
               </button>
             </div>
-            </div>
-
             <!-- 1. Vulnerability Title -->
             <div class="form-field-group">
               <label class="field-label" [class.label-invalid]="isFieldInvalid('vulnerabilityName')">Vulnerability title *</label>
