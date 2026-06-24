@@ -16,7 +16,7 @@
  *  9. Respond to IPC queries from the preload script.
  */
 
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu, shell } = require('electron');
 const path = require('path');
 const net = require('net');
 const http = require('http');
@@ -113,7 +113,141 @@ function resolveJar() {
   }
   return jar;
 }
+function showAboutDialog() {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'About Thales ISRA',
+    message: 'Thales ISRA — Security Risk Assessment Tool',
+    detail: `Version ${app.getVersion()}\n\nA desktop application for security risk assessment.`,
+    buttons: ['OK'],
+  });
+}
 
+function getUserGuidePath() {
+  return resolveResourcePath('documents', 'ISRA_User_Guide.pdf');
+}
+
+async function showUserGuideSaveDialog() {
+  const userGuidePath = getUserGuidePath();
+
+  if (!fs.existsSync(userGuidePath)) {
+    dialog.showErrorBox('User Guide Not Found', `Could not locate the user guide at:\n${userGuidePath}`);
+    return;
+  }
+
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: 'Save ISRA User Guide',
+    defaultPath: path.join(app.getPath('downloads'), 'ISRA_User_Guide.pdf'),
+    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+  });
+
+  if (canceled || !filePath) {
+    return;
+  }
+
+  try {
+    await fs.promises.copyFile(userGuidePath, filePath);
+    const result = await shell.openPath(filePath);
+    if (result) {
+      log.warn(`Unable to open saved user guide: ${result}`);
+    }
+  } catch (err) {
+    dialog.showErrorBox('Save Failed', `Could not save the user guide:\n${err.message}`);
+  }
+}
+
+function setupAppMenu() {
+  const template = [
+    ...(process.platform === 'darwin'
+      ? [{
+          label: app.name,
+          submenu: [
+            { role: 'about' },
+            { type: 'separator' },
+            { role: 'services' },
+            { type: 'separator' },
+            { role: 'hide' },
+            { role: 'hideOthers' },
+            { role: 'unhide' },
+            { type: 'separator' },
+            { role: 'quit' },
+          ],
+        }]
+      : []),
+    {
+      label: 'File',
+      submenu: [process.platform === 'darwin' ? { role: 'close' } : { role: 'quit' }],
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        ...(process.platform === 'darwin'
+          ? [
+              { role: 'pasteAndMatchStyle' },
+              { role: 'delete' },
+              { role: 'selectAll' },
+              { type: 'separator' },
+              {
+                label: 'Speech',
+                submenu: [{ role: 'startSpeaking' }, { role: 'stopSpeaking' }],
+              },
+            ]
+          : [{ role: 'delete' }, { type: 'separator' }, { role: 'selectAll' }]),
+      ],
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+      ],
+    },
+    {
+      label: 'Window',
+      submenu: process.platform === 'darwin'
+        ? [
+            { role: 'minimize' },
+            { role: 'zoom' },
+            { type: 'separator' },
+            { role: 'front' },
+          ]
+        : [
+            { role: 'minimize' },
+            { role: 'close' },
+          ],
+    },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'User Guide',
+          click: showUserGuideSaveDialog,
+        },
+        { type: 'separator' },
+        {
+          label: 'About',
+          click: showAboutDialog,
+        },
+      ],
+    },
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
 // ── Backend Process ────────────────────────────────────────────────────────────
 let backendProcess = null;
 
@@ -365,6 +499,7 @@ app.whenReady().then(async () => {
   fs.mkdirSync(path.join(appDataPath, 'tmp'), { recursive: true });
 
   setupLogging(appDataPath);
+  setupAppMenu();
 
   // 0. Show splash immediately — before any backend work begins
   createSplash();
