@@ -287,7 +287,7 @@ public class RiskController {
             path.getVulnerabilityRefs().add(RiskVulnerabilityRef.builder()
                     .attackPath(path)
                     .vulnerability(vuln)
-                    .score(vuln.getCveScore())
+                    .score(vuln.getCveScore() == null ? null : (double) Math.round(vuln.getCveScore()))
                     .name(vuln.getVulnerabilityName())
                     .build());
         }
