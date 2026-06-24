@@ -237,7 +237,7 @@ ISRA calculates three scores per risk scenario automatically:
 |---|---|
 | **Inherent Risk** | Risk before any mitigations |
 | **Mitigated Risk** | Projected risk if all planned mitigations are applied |
-| **Residual Risk** | Actual remaining risk after accepted (Reduce decision) mitigations |
+| **Residual Risk** | Remaining risk after applying completed mitigations (when the management decision is Mitigate/Transfer), otherwise the inherent risk (Accept) or 0 (Avoid/Discarded) |
 
 **Threat Factor** is the average of five attacker profile attributes (Skill Level, Reward, Resource Access, Group Size, Intrusion Detection), each rated 1–9. It maps to Low / Medium / High / Very High.
 
