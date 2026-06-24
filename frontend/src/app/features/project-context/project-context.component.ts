@@ -93,10 +93,12 @@ export class ProjectContextComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.route.queryParams.subscribe(params => {
-      const step = params['step'] ? parseInt(params['step'], 10) : 1;
-      this.currentStep.set(step);
-    });
+    this._subs.add(
+      this.route.queryParams.subscribe(params => {
+        const step = params['step'] ? parseInt(params['step'], 10) : 1;
+        this.currentStep.set(step);
+      })
+    );
   }
 
   ngOnDestroy(): void {
