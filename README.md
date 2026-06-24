@@ -341,12 +341,12 @@ tail -f ~/.config/SecurityRiskAssessmentTool/logs/backend.log
 
 This project follows the Angular 18 style guide with a few team-specific rules:
 
-- Use **standalone components** — do not set `standalone: true` inside `@Component` (it is the default)
-- Use **signals** (`signal()`, `computed()`, `effect()`) for all state — no RxJS `BehaviorSubject` for local state
+- Use **standalone components** (set `standalone: true` in `@Component`)
+- Use **signals** (`signal()`, `computed()`, `effect()`) for local state — no RxJS `BehaviorSubject` for local state
 - Use **`input()` / `output()`** functions, not `@Input` / `@Output` decorators
-- Use **native control flow** (`@if`, `@for`, `@switch`) — not `*ngIf` / `*ngFor`
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` on every component
-- Use **`inject()`** for dependency injection — not constructor injection
+- Templates currently use `*ngIf` / `*ngFor`; native control flow (`@if`, `@for`, `@switch`) is optional
+- `changeDetection: ChangeDetectionStrategy.OnPush` is recommended where practical
+- Both `inject()` and constructor injection are used; keep the style consistent within a file
 - Use **class bindings** — not `ngClass` or `ngStyle`
 - Use **reactive forms** — not template-driven forms
 - Avoid the `any` type; use `unknown` where the type is uncertain
