@@ -34,6 +34,8 @@ The Security Assessment Tool is a comprehensive Angular 18 application designed 
 ### Steps
 
 1. Clone the repository:
-```bash
-git clone https://github.com/Rush-me/security-assessment-tool.git
-cd security-assessment-tool
+
+    git clone https://github.com/Rush-me/security-assessment-tool.git
+    cd security-assessment-tool
+
+2. Refer to `instructions.md` for development guidelines and recommended Angular patterns.
