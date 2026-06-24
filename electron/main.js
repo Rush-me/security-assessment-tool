@@ -256,9 +256,10 @@ function createWindow(backendPort) {
   // Handle Angular HTML5 deep-link routing in production
   mainWindow.webContents.on('did-fail-load', (_event, _code, _desc, url) => {
     if (url.startsWith('file://') && !url.endsWith('index.html')) {
+      const { hash } = new URL(url);
       mainWindow.loadFile(
         resolveResourcePath('frontend', 'index.html'),
-        { hash: new URL(url).hash || '/' }
+        { hash: hash ? hash.replace(/^#/, '') : '/' }
       );
     }
   });
