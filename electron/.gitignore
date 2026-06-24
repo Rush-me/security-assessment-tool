@@ -1,0 +1,15 @@
+# Electron build output
+dist/
+out/
+
+# Bundled JRE (downloaded at build time — do not commit)
+jre/
+
+# Node modules
+node_modules/
+
+# Electron-builder cache
+.buildcache/
+
+# Logs
+*.log

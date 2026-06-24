@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading…</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .splash {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0a0f1e 0%, #0d1b35 50%, #071224 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 198, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 198, 255, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: grid-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes grid-pulse {
+
+      0%,
+      100% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1.0;
+      }
+    }
+
+    .orb {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center,
+          rgba(0, 198, 255, 0.15) 0%,
+          rgba(0, 90, 200, 0.08) 40%,
+          transparent 70%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: orb-breathe 3s ease-in-out infinite;
+    }
+
+    @keyframes orb-breathe {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 1.0;
+      }
+    }
+
+    .logo-wrap {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 22px;
+      border: 2px solid rgba(0, 198, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 198, 255, 0.06);
+      box-shadow:
+        0 0 30px rgba(0, 198, 255, 0.20),
+        inset 0 0 20px rgba(0, 198, 255, 0.05);
+      animation: ring-glow 3s ease-in-out infinite;
+    }
+
+    @keyframes ring-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 30px rgba(0, 198, 255, 0.20), inset 0 0 20px rgba(0, 198, 255, 0.05);
+      }
+
+      50% {
+        box-shadow: 0 0 50px rgba(0, 198, 255, 0.40), inset 0 0 25px rgba(0, 198, 255, 0.10);
+      }
+    }
+
+    .logo-ring svg {
+      width: 52px;
+      height: 52px;
+    }
+
+    .brand {
+      text-align: center;
+    }
+
+    .brand-company {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(0, 198, 255, 0.65);
+      margin-bottom: 6px;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.40);
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .status-area {
+      position: relative;
+      z-index: 10;
+      margin-top: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 280px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 35%;
+      position: absolute;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      border-radius: 99px;
+      box-shadow: 0 0 8px rgba(0, 198, 255, 0.6);
+      animation: indeterminate 1.8s ease-in-out infinite;
+    }
+
+    @keyframes indeterminate {
+      0% {
+        left: -35%;
+        width: 35%;
+      }
+
+      100% {
+        left: 110%;
+        width: 35%;
+      }
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.40);
+      letter-spacing: 0.5px;
+      animation: text-fade 1.8s ease-in-out infinite;
+    }
+
+    @keyframes text-fade {
+
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+
+      50% {
+        opacity: 1.0;
+      }
+    }
+
+    .corner {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: rgba(0, 198, 255, 0.25);
+      border-style: solid;
+      border-width: 0;
+    }
+
+    .corner.tl {
+      top: 18px;
+      left: 18px;
+      border-top-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .corner.tr {
+      top: 18px;
+      right: 18px;
+      border-top-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .corner.bl {
+      bottom: 18px;
+      left: 18px;
+      border-bottom-width: 2px;
+      border-left-width: 2px;
+    }
+
+    .corner.br {
+      bottom: 18px;
+      right: 18px;
+      border-bottom-width: 2px;
+      border-right-width: 2px;
+    }
+
+    .version {
+      position: absolute;
+      bottom: 28px;
+      right: 28px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.20);
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="splash">
+    <div class="grid-bg"></div>
+    <div class="orb"></div>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="logo-wrap">
+      <div class="logo-ring">
+        <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M26 4L8 12V26C8 36.4 16 45.4 26 48C36 45.4 44 36.4 44 26V12L26 4Z" stroke="url(#sg)"
+            stroke-width="1.8" fill="rgba(0,198,255,0.07)" />
+          <circle cx="26" cy="26" r="5" fill="url(#sg)" opacity="0.9" />
+          <line x1="26" y1="21" x2="26" y2="16" stroke="rgba(0,198,255,0.5)" stroke-width="1.2" />
+          <line x1="26" y1="31" x2="26" y2="36" stroke="rgba(0,198,255,0.5)" stroke-width="1.2" />
+          <line x1="21" y1="26" x2="16" y2="26" stroke="rgba(0,198,255,0.5)" stroke-width="1.2" />
+          <line x1="31" y1="26" x2="36" y2="26" stroke="rgba(0,198,255,0.5)" stroke-width="1.2" />
+          <circle cx="26" cy="15" r="2" fill="rgba(0,198,255,0.4)" />
+          <circle cx="26" cy="37" r="2" fill="rgba(0,198,255,0.4)" />
+          <circle cx="15" cy="26" r="2" fill="rgba(0,198,255,0.4)" />
+          <circle cx="37" cy="26" r="2" fill="rgba(0,198,255,0.4)" />
+          <defs>
+            <linearGradient id="sg" x1="8" y1="4" x2="44" y2="48" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#00c6ff" />
+              <stop offset="100%" stop-color="#0072ff" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="brand">
+        <div class="brand-company">Thales Group</div>
+        <div class="brand-title">ISRA</div>
+        <div class="brand-subtitle">Security Risk Assessment Tool</div>
+      </div>
+    </div>
+
+    <div class="status-area">
+      <div class="progress-track">
+        <div class="progress-bar"></div>
+      </div>
+      <div class="status-text" id="statusText">Initializing secure environment…</div>
+    </div>
+
+    <div class="version" id="versionLabel">v1.0.0</div>
+  </div>
+
+  <script>
+    const messages = [
+      'Initializing secure environment…',
+      'Starting risk assessment engine…',
+      'Loading project database…',
+      'Preparing analytics modules…',
+      'Almost ready…'
+    ];
+    let idx = 0;
+    const el = document.getElementById('statusText');
+    setInterval(() => {
+      idx = (idx + 1) % messages.length;
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.textContent = messages[idx];
+        el.style.opacity = '';
+      }, 300);
+    }, 2200);
+  </script>
+</body>
+
+</html>
