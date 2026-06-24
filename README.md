@@ -276,7 +276,7 @@ AI suggestions are contextual starting points. Always review and validate them a
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/api/auth/login` | Authenticate and receive JWT |
+| `POST` | `/api/auth/login` | Authenticate and receive the user profile (no JWT; client sends `X-Username` on subsequent requests) |
 | `POST` | `/api/auth/register` | Create a new user account |
 | `GET` | `/api/projects` | List all projects |
 | `POST` | `/api/projects` | Create a new project |
