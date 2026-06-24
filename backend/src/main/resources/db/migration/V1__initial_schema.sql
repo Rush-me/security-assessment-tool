@@ -1,5 +1,5 @@
 -- ============================================================
--- ISRA Database Schema - V1 (Azure AD - no local users table)
+-- ISRA Database Schema - V1 (initial schema)
 -- ============================================================
 
 -- Create ISRA Projects table
