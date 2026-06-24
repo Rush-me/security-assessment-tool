@@ -82,16 +82,16 @@ graph TD
   * Coordinates multi-tab schema validations (`validateClasses()`) before saving documents.
 
 ### D. Backend Library / Core Logic Layer (lib)
-* **Location**: [lib/src/](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/lib/src)
+* **Location**: `lib/src/`
 * **Description**: An independent, self-contained module containing calculations, sanitizers, and validation logic.
-* **API Entrypoint ([lib/src/api/index.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/lib/src/api/index.js))**:
+* **API Entrypoint (`lib/src/api/index.js`)**:
   * `DataNew`: Returns a blank project template initialized to organizational defaults.
   * `DataLoad`: Loads raw files, sanitizes fields, validates structure against the JSON schema, and instantiates an `ISRAProject` class representation.
   * `DataStore`: Serializes `ISRAProject` domains to valid JSON strings and writes them to local storage.
   * `XML2JSON`: Translates legacy XML structures to the unified JSON schema.
-* **Validation Subsystem ([lib/src/model/schema/json-schema.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/lib/src/model/schema/json-schema.js))**:
-  * Utilizes `ajv` (Another JSON Schema Validator) to validate data objects. Ensure structural verification and schema integrity.
-* **Object Models ([lib/src/model/classes/](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/lib/src/model/classes))**:
+* **Validation Subsystem (`lib/src/model/schema/json-schema.js`)**:
+  * Utilizes `ajv` (Another JSON Schema Validator) to validate data objects. Ensures structural verification and schema integrity.
+* **Object Models (`lib/src/model/classes/`)**:
   * Defines domain entities: `ISRAProject`, `BusinessAsset`, `SupportingAsset`, `Risk`, `Vulnerability`, `ISRAProjectContext`, and `ISRAMetaTracking`. Private fields (`#fieldName`) protect object mutations.
 
 ---
