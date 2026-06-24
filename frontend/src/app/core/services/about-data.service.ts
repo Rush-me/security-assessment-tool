@@ -6,10 +6,11 @@ import { AboutDataDialogComponent } from '../../shared/components/about-data-dia
 export class AboutDataService {
   private dialog = inject(MatDialog);
 
-  private readonly content: Record<string, { title: string; body: string }> = {
+  private readonly content: Record<string, { title: string; body: string; showDiagram?: boolean }> = {
     'basic-info': {
-      title: 'Basic Project Information',
-      body: 'Enter the fundamental project details including project name, version, owning organization, and security classification. This information forms the identification header of your ISRA report and helps scope the assessment.'
+      title: 'ISRA Methodology — Purpose & Data Flow',
+      body: 'Risk is a combination of five dimensions: Business Assets, Supporting Assets, Vulnerabilities, Threats, and Threat Agents. Each dimension must be evaluated to compute the overall risk level per ISO/IEC 27005:2022.',
+      showDiagram: true
     },
     'project-context': {
       title: 'Project Context',
@@ -39,6 +40,7 @@ export class AboutDataService {
 
   open(page: string): void {
     const data = this.content[page] ?? { title: 'About', body: '' };
-    this.dialog.open(AboutDataDialogComponent, { width: '520px', data });
+    const width = data.showDiagram ? '820px' : '520px';
+    this.dialog.open(AboutDataDialogComponent, { width, maxWidth: '95vw', data });
   }
 }

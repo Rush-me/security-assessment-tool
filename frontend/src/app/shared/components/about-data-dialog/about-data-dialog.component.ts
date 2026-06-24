@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./about-data-dialog.component.scss']
 })
 export class AboutDataDialogComponent {
-  readonly data = inject<{ title: string; body: string }>(MAT_DIALOG_DATA);
+  readonly data = inject<{ title: string; body: string; showDiagram?: boolean }>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<AboutDataDialogComponent>);
 
   close(): void {
