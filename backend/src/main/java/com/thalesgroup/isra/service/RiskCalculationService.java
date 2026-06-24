@@ -152,6 +152,8 @@ public class RiskCalculationService {
         String verb = risk.getThreatVerb();
         if (verb == null) return;
 
+        verb = verb.trim().toLowerCase();
+
         // Reset flags first
         risk.setConfidentialityFlag(0);
         risk.setIntegrityFlag(0);
@@ -160,17 +162,20 @@ public class RiskCalculationService {
         risk.setAuthorizationFlag(0);
         risk.setNonRepudiationFlag(0);
 
-        if ("steal".equals(verb) || "disclose".equals(verb) || "lose".equals(verb)) {
+        if ("steal".equals(verb) || "steals".equals(verb) ||
+            "disclose".equals(verb) || "discloses".equals(verb) ||
+            "lose".equals(verb) || "loses".equals(verb)) {
             risk.setConfidentialityFlag(1);
-        } else if ("tamper with".equals(verb)) {
+        } else if ("tamper with".equals(verb) || "tampers with".equals(verb)) {
             risk.setIntegrityFlag(1);
-        } else if ("deny access to".equals(verb) || "flood".equals(verb)) {
+        } else if ("deny access to".equals(verb) || "denies access to".equals(verb) ||
+                   "flood".equals(verb) || "floods".equals(verb)) {
             risk.setAvailabilityFlag(1);
-        } else if ("spoof".equals(verb)) {
+        } else if ("spoof".equals(verb) || "spoofs".equals(verb)) {
             risk.setAuthenticityFlag(1);
-        } else if ("repudiate".equals(verb)) {
+        } else if ("repudiate".equals(verb) || "repudiates".equals(verb)) {
             risk.setNonRepudiationFlag(1);
-        } else if ("gain an unauthorized access to".equals(verb)) {
+        } else if ("gain an unauthorized access to".equals(verb) || "gains an unauthorized access to".equals(verb)) {
             risk.setAuthorizationFlag(1);
         }
     }
