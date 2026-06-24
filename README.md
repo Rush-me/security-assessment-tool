@@ -366,7 +366,7 @@ This project follows the Angular 18 style guide with a few team-specific rules:
 
 ## Authors
 
-Developed by the Thales Group  engineering team as part of an internal hackathon to modernise the ISRA toolchain.
+Developed by the Thales Group engineering team as part of an internal hackathon to modernise the ISRA toolchain.
 
 ---
 
