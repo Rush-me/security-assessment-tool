@@ -74,9 +74,9 @@ graph TD
   * `window.welcome`, `window.projectContext`, `window.businessAssets`, `window.supportingAssets`, `window.risks`, `window.vulnerabilities`: Exposes sub-features (adding/updating/deleting list rows).
 
 ### C. Host Application Layer (Electron Main Process)
-* **Location**: [app/src/electron/main.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/electron/main.js)
+* **Location**: `app/src/electron/main.js`
 * **Description**: Runs with full system access. Launches the host desktop window, maximizes views, defines system menus (File, Edit, Window), and listens to lifecycle changes.
-* **IPC Controller ([request-handlers.js](file:///c:/Users/RasmiranjanNAYAK/thales/ags/poc/security-risk-assessment-tool/app/src/electron/request-handlers.js))**:
+* **IPC Controller (`app/src/electron/request-handlers.js`)**:
   * Tracks the active `ISRAProject` domain instance.
   * Acts as the controller in the MVC-pattern, routing window inputs and delegating business computations to the backend library API.
   * Coordinates multi-tab schema validations (`validateClasses()`) before saving documents.
