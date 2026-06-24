@@ -1,0 +1,101 @@
+﻿node.exe : This Node.js version (v24.7.0) has not been tested with this 
+version of Cucumber; it should work normally, but please raise an issue if you 
+see anything unexpected.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\Ksheerabdhi-tanayaTR\A ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (This Node.js ve...ing unexpected. 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+`publishQuiet` option is no longer needed, you can remove it from your 
+configuration; see 
+https://github.com/cucumber/cucumber-js/blob/main/docs/deprecations.md
+Cannot use 'progress-bar' formatter for output to 'stdout' as not a TTY. 
+Switching to 'progress' formatter.
+...[BusinessAsset] Starting asset creation for: {
+  name: 'BA-1782323189539',
+  type: 'Information',
+  c: 1,
+  i: 1,
+  a: 1,
+  au: 1,
+  az: 1,
+  nr: 1
+}
+[BusinessAsset] openAddAssetForm starting
+[BusinessAsset] Form already visible: false
+[BusinessAsset] Header button visible: true
+[BusinessAsset] Empty state button visible: true
+[BusinessAsset] Total buttons on page: 10
+[BusinessAsset] btn-primary-add buttons: 2
+[BusinessAsset] Clicking empty state button
+[BusinessAsset] Waiting for asset name input after clicking button
+[BusinessAsset] Asset name input found, form is open
+[BusinessAsset] Selecting mat-select options...
+[BusinessAsset] Error selecting options: locator.waitFor: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('mat-select[formcontrolname="confidentiality"]') to be visible[22m
+
+F-....[BusinessAsset] Starting asset creation for: {
+  name: 'BA-1782323201939',
+  type: 'Information',
+  c: 1,
+  i: 1,
+  a: 1,
+  au: 1,
+  az: 1,
+  nr: 1
+}
+[BusinessAsset] openAddAssetForm starting
+[BusinessAsset] Form already visible: true
+[BusinessAsset] Selecting mat-select options...
+[BusinessAsset] Error selecting options: locator.waitFor: Timeout 10000ms exceeded.
+Call log:
+[2m  - waiting for locator('mat-select[formcontrolname="confidentiality"]') to be visible[22m
+
+F-.
+
+Failures:
+
+1) Scenario: Complete full wizard progression (attempt 2) # features\wizard-workflow.feature:12
+   ΓêÜ Before # hooks\hooks.js:65
+   ΓêÜ Given the Electron ISRA application is running # step-definitions\common.steps.js:3
+   ΓêÜ And I am logged in with valid credentials # step-definitions\auth.steps.js:3
+   ├ù When I complete wizard steps from basic info through mitigation # step-definitions\wizard.steps.js:3
+       locator.waitFor: Timeout 10000ms exceeded.
+       Call log:
+       [2m  - waiting for locator('mat-select[formcontrolname="confidentiality"]') to be visible[22m
+
+           at BusinessAssetPage.click (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BasePage.js:9:19)
+           at BusinessAssetPage.selectMatOption (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BusinessAssetPage.js:91:16)
+           at async BusinessAssetPage.createBusinessAsset (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BusinessAssetPage.js:120:7)
+           at async CustomWorld.<anonymous> (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\step-definitions\wizard.steps.js:23:3)
+   - Then wizard progression should succeed # step-definitions\wizard.steps.js:67
+   ΓêÜ After # hooks\hooks.js:83
+       Attachment (text/plain): Screenshot: C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\screenshots\Complete_full_wizard_progression-1782323212309.png
+       Attachment (text/plain): Trace placeholder: C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\traces\Complete_full_wizard_progression-1782323212309.zip
+
+Warnings:
+
+1) Scenario: Complete full wizard progression (attempt 1, retried) # features\wizard-workflow.feature:12
+   ΓêÜ Before # hooks\hooks.js:65
+   ΓêÜ Given the Electron ISRA application is running # step-definitions\common.steps.js:3
+   ΓêÜ And I am logged in with valid credentials # step-definitions\auth.steps.js:3
+   ├ù When I complete wizard steps from basic info through mitigation # step-definitions\wizard.steps.js:3
+       locator.waitFor: Timeout 10000ms exceeded.
+       Call log:
+       [2m  - waiting for locator('mat-select[formcontrolname="confidentiality"]') to be visible[22m
+
+           at BusinessAssetPage.click (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BasePage.js:9:19)
+           at BusinessAssetPage.selectMatOption (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BusinessAssetPage.js:91:16)
+           at async BusinessAssetPage.createBusinessAsset (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\pages\BusinessAssetPage.js:120:7)
+           at async CustomWorld.<anonymous> (C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\step-definitions\wizard.steps.js:23:3)
+   - Then wizard progression should succeed # step-definitions\wizard.steps.js:67
+   ΓêÜ After # hooks\hooks.js:83
+       Attachment (text/plain): Screenshot: C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\screenshots\Complete_full_wizard_progression-1782323200147.png
+       Attachment (text/plain): Trace placeholder: C:\Users\Ksheerabdhi-tanayaTR\Desktop\kshwork\AI-Task\Hackathon-A4I\Working\security-assessment-tool\generated\playwright-electron-framework\traces\Complete_full_wizard_progression-1782323200147.zip
+
+1 scenario (1 failed)
+4 steps (1 failed, 1 skipped, 2 passed)
+0m59.759s (executing steps: 0m26.341s)

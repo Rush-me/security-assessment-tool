@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "node scripts/build.js --dev",
     "build": "node scripts/build.js --prod",
+    "test": "node --test *.spec.js scripts/*.spec.js",
     "pack": "electron-builder --dir",
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
