@@ -1,0 +1,330 @@
+:host { display: flex; flex-direction: column; height: 100%; }
+
+.dashboard-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg-page);
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+/* search box */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: var(--bg-surface);
+  
+  mat-icon {
+    color: var(--text-secondary);
+    font-size: 18px;
+  }
+  
+  input {
+    border: none;
+    outline: none;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background: transparent;
+    width: 180px;
+  }
+}
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-top: 24px;
+  
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted);
+  }
+  
+  h3 {
+    color: var(--text-primary);
+    margin: 12px 0 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0 0 20px;
+  }
+}
+
+/* modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  
+  .modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+  }
+  
+  button {
+    color: var(--text-secondary);
+  }
+}
+
+.modal-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 8px;
+  
+  button[type="button"] {
+    border: 1px solid var(--border-strong) !important;
+    color: var(--text-primary) !important;
+    background: var(--bg-surface) !important;
+    border-radius: 6px !important;
+    
+    &:hover {
+      background: var(--bg-surface-2) !important;
+    }
+  }
+
+  button[type="submit"] {
+    background: var(--accent) !important;
+    color: #ffffff !important;
+    border-radius: 6px !important;
+
+    &:hover {
+      background: var(--accent-hover) !important;
+    }
+  }
+}
+
+/* Premium Card Grid Layout */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.project-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: var(--accent);
+  }
+
+  .card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+
+    .project-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .project-dept {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+  }
+
+  .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: flex-start;
+
+    .stats-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+
+      .stat-item {
+        strong {
+          color: var(--text-primary);
+          font-weight: 600;
+        }
+      }
+
+      .stats-dot {
+        color: var(--text-muted);
+      }
+    }
+
+    .risk-badge-wrapper {
+      display: flex;
+      margin-top: 2px;
+    }
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+
+    .updated-date {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .btn-delete-card {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s, background-color 0.15s;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.08);
+      }
+    }
+  }
+
+  /* Style for "Create new assessment" card */
+  &.create-new-card {
+    border: 2px dashed var(--border-strong);
+    background: var(--bg-surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+
+    &:hover {
+      border-color: var(--accent);
+      background: var(--bg-card);
+      
+      .create-icon-wrapper {
+        background: var(--accent);
+        color: #ffffff;
+      }
+      .create-text {
+        color: var(--accent);
+      }
+    }
+
+    .create-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
+
+      .create-icon-wrapper {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 1px solid var(--border-strong);
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s, color 0.2s;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      .create-text {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: color 0.2s;
+      }
+    }
+  }
+}

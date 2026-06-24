@@ -1,0 +1,44 @@
+@use 'variables' as *;
+
+// --- Transition helpers ---
+@mixin transition($props: all, $dur: 0.2s, $ease: ease) {
+  transition: $props $dur $ease;
+}
+
+// --- Scrollbar ---
+@mixin styled-scrollbar {
+  &::-webkit-scrollbar { width: 6px; height: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: $scroll-color; border-radius: 3px; }
+  &::-webkit-scrollbar-thumb:hover { background: darken($scroll-color, 15%); }
+}
+
+// --- Badge by level ---
+@mixin risk-badge($bg, $color) {
+  background: $bg;
+  color: $color;
+  border: 1px solid darken($bg, 8%);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+// --- Card base ---
+@mixin card-base {
+  background: $white;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid $c-border;
+}
+
+// --- Page header row ---
+@mixin page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}

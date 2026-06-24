@@ -1,0 +1,175 @@
+<div class="app-shell">
+
+  <!-- ============ NAVBAR ============ -->
+  <header class="isra-navbar">
+    <div class="header-brand" (click)="goToDashboard()">
+      <div class="brand-logo-container">
+        <svg class="brand-logo-svg" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <div class="brand-text-col">
+        <span class="brand-name">ISRA<span class="brand-dot">.</span></span>
+        <span class="brand-sub">Security Risk Assessment</span>
+      </div>
+    </div>
+
+    @if (activeProject()) {
+      <div class="header-center-meta">
+        <span class="project-name">{{ activeProject()?.projectName }}</span>
+        <span class="project-version-badge">v{{ activeProject()?.projectVersion }}</span>
+      </div>
+    }
+
+    <div class="header-actions">
+      @if (activeProject()?.classification) {
+        <button class="classification-badge">{{ activeProject()?.classification }}</button>
+      }
+
+      <!-- AI Status Badge -->
+      <div class="ai-status-badge" [attr.data-state]="aiState()" [title]="aiStatusMessage()">
+        <span class="ai-dot"></span>
+        <span>{{ aiState() === 'available' ? 'AI Online' : (aiState() === 'offline' ? 'AI Offline' : 'AI N/A') }}</span>
+        <button class="ai-refresh-btn" (click)="refreshAiStatus()" title="Refresh AI status">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+
+      <button class="btn-theme-toggle" (click)="toggleTheme()" matTooltip="Toggle Theme">
+        @if (currentTheme() === 'light') {
+          <mat-icon>dark_mode</mat-icon>
+        } @else {
+          <mat-icon>light_mode</mat-icon>
+        }
+      </button>
+
+      <div class="user-avatar-wrapper">
+        <button class="user-avatar-btn" (click)="toggleUserPopup($event)">
+          {{ getUserInitials() }}
+        </button>
+
+        @if (showUserPopup()) {
+          <div class="user-popup-container">
+            <div class="popup-header">
+              <div class="popup-avatar">{{ getUserInitials() }}</div>
+              <div class="popup-user-info">
+                <span class="popup-name">{{ currentUser()?.username }}</span>
+                <span class="popup-email">{{ currentUser()?.email || 'no-email@thales.com' }}</span>
+              </div>
+            </div>
+            <hr class="popup-divider" />
+            <button class="popup-row">
+              <mat-icon>person_outline</mat-icon>
+              <span>My profile</span>
+            </button>
+            <button class="popup-row">
+              <mat-icon>settings</mat-icon>
+              <span>Settings</span>
+            </button>
+            <hr class="popup-divider" />
+            <button class="popup-row sign-out" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Sign out</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ STEPPER ============ -->
+  @if (activeProject()) {
+    <nav class="wizard-stepper">
+      @for (step of steps; track step.index; let last = $last) {
+        <div
+          class="step-item"
+          [class.active]="isStepActive(step)"
+          [class.completed]="isStepCompleted(step)"
+          (click)="navigateToStep(step)">
+          <div class="step-circle">
+            @if (isStepCompleted(step)) {
+              <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;color:#fff">check</mat-icon>
+            } @else {
+              {{ step.index }}
+            }
+          </div>
+          <span class="step-label">{{ step.label }}</span>
+        </div>
+        @if (!last) {
+          <div class="step-connector" [class.completed]="isStepCompleted(step)"></div>
+        }
+      }
+    </nav>
+  }
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <div class="workspace-body">
+    @if (isLoading()) {
+      <div style="display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:#5D607E;">
+        <mat-icon style="animation:spin 1s linear infinite">sync</mat-icon>
+        <span>Loading assessment...</span>
+      </div>
+    } @else {
+      <router-outlet></router-outlet>
+    }
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  @if (activeProject()) {
+    <footer class="wizard-footer">
+      <button class="btn-back" (click)="goBack()">
+        <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;">arrow_back</mat-icon> Back
+      </button>
+      @if (isLastStep()) {
+        <span class="footer-autosave">Review your complete risk assessment below</span>
+      } @else {
+        <span class="footer-autosave">Click “Save &amp; Continue” to save your changes</span>
+      }
+      <button class="btn-continue" (click)="goNext()" [disabled]="isSaving()">
+        @if (isSaving()) {
+          <mat-spinner diameter="16" style="display:inline-block;margin-right:6px"></mat-spinner>
+          Saving...
+        } @else if (isLastStep()) {
+          <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;">check</mat-icon>
+          Finish
+        } @else {
+          Save &amp; Continue
+          <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;">arrow_forward</mat-icon>
+        }
+      </button>
+    </footer>
+  }
+
+  <!-- ============ ABOUT DRAWER OVERLAY ============ -->
+  <div class="about-drawer-overlay" [class.open]="drawerOpen()" (click)="closeDrawer()"></div>
+
+  <!-- ============ ABOUT DRAWER ============ -->
+  <aside class="about-drawer" [class.open]="drawerOpen()">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-step-label">{{ activeStep().drawerStepLabel }}</div>
+        <h2 class="drawer-title">{{ activeStep().drawerTitle }}</h2>
+      </div>
+      <button mat-icon-button class="drawer-close" (click)="closeDrawer()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <p>{{ activeStep().drawerIntro }}</p>
+      @for (section of activeStep().drawerSections; track section.title) {
+        <div class="drawer-section">
+          <h4>{{ section.title }}</h4>
+          <p>{{ section.body }}</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+</div>
+
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>

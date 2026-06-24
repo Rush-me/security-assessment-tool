@@ -1,0 +1,397 @@
+.reports-container {
+  padding: 1.5rem 2rem;
+  background: var(--bg-page);
+  min-height: calc(100vh - 112px);
+  box-sizing: border-box;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+
+  .header-left {
+    .page-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+    }
+
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--accent, #1a56db);
+      font-style: italic;
+      margin: 0;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+}
+
+.btn-outline-about {
+  height: 34px;
+  font-size: 13px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.15s;
+
+  &:hover { background: var(--bg-surface-2); }
+
+  .btn-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+.btn-primary-export {
+  height: 36px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--accent, #1a56db);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover { background: var(--accent-hover, #1648c0); }
+
+  .btn-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+// ── KPI Cards ────────────────────────────────────────────────────────────────
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .kpi-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+
+    &.kpi-danger { color: #c81e1e; }
+    &.kpi-safe   { color: #065f46; }
+    &.kpi-accent { color: var(--accent, #1a56db); }
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+}
+
+// ── Chart Card ───────────────────────────────────────────────────────────────
+
+.chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .chart-card-header {
+    margin-bottom: 16px;
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .chart-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+  }
+}
+
+.chart-body {
+  display: flex;
+  gap: 12px;
+  height: 240px;
+}
+
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 6px 28px 0;  // bottom matches x-axis height
+  align-items: flex-end;
+  flex-shrink: 0;
+
+  .y-tick {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1;
+  }
+}
+
+.plot-area {
+  position: relative;
+  flex: 1;
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: visible;
+}
+
+// Background bands
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+
+  &.band-danger {
+    top: 0;
+    height: 30%;          // top 30% = scores 0.7–1.0
+    background: rgba(239, 68, 68, 0.05);
+  }
+
+  &.band-safe {
+    bottom: 0;
+    height: 27%;          // bottom 27% = scores 0–0.3 (accounting for 5% margin)
+    background: rgba(34, 197, 94, 0.06);
+  }
+}
+
+// Dashed reference lines
+.ref-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 1px dashed;
+  pointer-events: none;
+
+  &.ref-line-danger { border-color: #fca5a5; }
+  &.ref-line-safe   { border-color: #86efac; }
+}
+
+.decision-columns {
+  position: absolute;
+  inset: 0;
+  bottom: 28px;  // leave room for x-axis
+  display: flex;
+}
+
+.decision-col {
+  flex: 1;
+  position: relative;
+  border-right: 1px dashed var(--border);
+
+  &:last-child { border-right: none; }
+}
+
+.risk-dot {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #ffffff;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: default;
+  z-index: 1;
+  transition: z-index 0s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+
+  &:hover { z-index: 10; transform: translateX(-50%) scale(1.15); }
+}
+
+.x-axis {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+
+  span {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 28px;
+  }
+}
+
+// Legend
+.chart-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+// ── Risk Register Table ───────────────────────────────────────────────────────
+
+.table-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+
+  .table-card-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.risk-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: var(--bg-surface);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .risk-row {
+    border-bottom: 1px solid var(--border);
+    transition: background-color 0.12s;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--bg-surface-2); }
+
+    td { padding: 12px 16px; vertical-align: middle; }
+  }
+
+  .col-desc { width: 42%; }
+  .col-score { width: 10%; text-align: center; }
+  .col-badge { width: 12%; text-align: center; }
+
+  .risk-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent, #1a56db);
+    line-height: 1.4;
+  }
+
+  .risk-id {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .score-body {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: center;
+
+    &.muted { font-weight: 400; color: var(--text-secondary); }
+    &.bold  { font-weight: 700; }
+  }
+}
+
+// ── Canonical pill / badge tokens ─────────────────────────────────────────────
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 2px 9px;
+  white-space: nowrap;
+
+  // Residual level
+  &.pill-level-critical { background: #fde8e8; color: #c81e1e; }
+  &.pill-level-high     { background: #fdf0d5; color: #8e4b10; }
+  &.pill-level-moderate { background: #fef3cd; color: #92610a; }
+  &.pill-level-low      { background: #d1fae5; color: #065f46; }
+  &.pill-level-none     { background: var(--bg-surface-2); color: var(--text-muted); }
+
+  // Management decision
+  &.pill-decision-mitigate { background: #d1fae5; color: #065f46; }
+  &.pill-decision-accept   { background: #e0f2fe; color: #0369a1; }
+  &.pill-decision-transfer { background: #ede9fe; color: #5b21b6; }
+  &.pill-decision-avoid    { background: #fef3cd; color: #92610a; }
+}
+

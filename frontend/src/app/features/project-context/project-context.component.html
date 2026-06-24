@@ -1,0 +1,115 @@
+<div class="context-container">
+
+  <!-- Header row -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Project Context</h1>
+      <p class="page-subtitle">
+        Describe the project scope, objectives, and security assumptions.
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about" (click)="openDrawer()">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+    </div>
+  </div>
+
+  <form [formGroup]="contextForm">
+
+    <!-- ── Project Description ─────────────────────────────── -->
+    <div class="editor-card">
+
+      <div class="card-section-header">
+        <span class="section-title">Project Description *</span>
+        <div class="section-actions">
+          <button type="button" class="btn-action-sm" (click)="onFileInputClick()">
+            <mat-icon>upload</mat-icon> Upload document
+          </button>
+          <input #fileInput type="file" style="display:none" (change)="onFileSelected($event)">
+          <button type="button" class="btn-action-sm" (click)="showUrlInput.set(!showUrlInput())">
+            <mat-icon>link</mat-icon> {{ showUrlInput() ? 'Hide URL' : 'Insert URL' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="form-field-group">
+        <textarea formControlName="projectDescription" class="form-textarea"
+                  [class.field-invalid]="submitted() && contextForm.get('projectDescription')?.invalid"
+                  rows="5"
+                  placeholder="Describe the project being assessed — its purpose, architecture and scope..."></textarea>
+        @if (submitted() && contextForm.get('projectDescription')?.invalid) {
+          <span class="field-error-msg"><mat-icon>warning</mat-icon>Description is required</span>
+        }
+      </div>
+
+      @if (showUrlInput()) {
+        <div class="form-field-group" style="margin-top:10px">
+          <label class="field-label">Reference URL</label>
+          <input type="url" formControlName="projectUrl" class="form-input"
+                 placeholder="https://confluence.example.com/project-spec" />
+        </div>
+      }
+
+      @if (contextForm.get('projectUrl')?.value && !showUrlInput()) {
+        <div class="url-link-row">
+          <mat-icon>link</mat-icon>
+          <a [href]="contextForm.get('projectUrl')?.value" target="_blank">
+            {{ contextForm.get('projectUrl')?.value }}
+          </a>
+        </div>
+      }
+
+      @if (attachmentName()) {
+        <div class="url-link-row">
+          <mat-icon>attach_file</mat-icon>
+          <span>{{ attachmentName() }}</span>
+          <button type="button" class="btn-action-sm" (click)="onDownloadAttachment()">
+            <mat-icon>download</mat-icon> Download
+          </button>
+        </div>
+      }
+
+      @if (selectedFile()) {
+        <div class="url-link-row">
+          <mat-icon>attach_file</mat-icon>
+          <span>{{ selectedFile()?.name }}</span>
+          <button type="button" class="btn-action-sm" (click)="onUploadAttachment()">
+            <mat-icon>cloud_upload</mat-icon> Upload
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- ── Security Objectives ─────────────────────────────── -->
+    <div class="editor-card" style="margin-top:16px">
+
+      <div class="card-section-header">
+        <span class="section-title">Security Objectives &amp; Assumptions</span>
+      </div>
+
+      <div class="form-field-group">
+        <label class="field-label">Security project objectives</label>
+        <p class="field-hint">Security goals from the product / project manager's perspective.</p>
+        <textarea formControlName="securityProjectObjectives" class="form-textarea" rows="4"
+                  placeholder="Describe the security goals for this project..."></textarea>
+      </div>
+
+      <div class="form-field-group" style="margin-top:14px">
+        <label class="field-label">Security officer objectives</label>
+        <textarea formControlName="securityOfficerObjectives" class="form-textarea" rows="3"
+                  placeholder="Objectives from the security officer's perspective..."></textarea>
+      </div>
+
+      <div class="form-field-group" style="margin-top:14px">
+        <label class="field-label">Security assumptions</label>
+        <textarea formControlName="securityAssumptions" class="form-textarea" rows="3"
+                  placeholder="List any assumptions that underpin this assessment..."></textarea>
+      </div>
+
+    </div>
+
+  </form>
+
+</div>

@@ -1,0 +1,378 @@
+.supporting-assets-container {
+  padding: 1.5rem 2rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--bg-page);
+  min-height: calc(100vh - 112px);
+}
+
+// ── Header Row ────────────────────────────────────────────
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  .header-left {
+    .page-title {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 4px 0;
+    }
+    .page-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .btn-outline-about {
+      height: 34px;
+      font-size: 13px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.15s;
+      &:hover { background: var(--bg-surface-2); }
+    }
+
+    .btn-primary-add {
+      background: var(--accent);
+      color: #ffffff;
+      height: 36px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s;
+      &:hover { background: var(--accent-hover); }
+    }
+
+    .btn-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      line-height: 16px;
+    }
+  }
+}
+
+// ── Validation banner ─────────────────────────────────────
+.validation-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #856404;
+  margin-bottom: 16px;
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+}
+
+// ── Editor card ───────────────────────────────────────────
+.editor-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+.card-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.btn-close-card {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  transition: background 0.15s;
+  &:hover { background: var(--bg-surface-2); }
+  mat-icon { font-size: 16px; width: 16px; height: 16px; line-height: 16px; }
+}
+
+// ── Form field helpers ────────────────────────────────────
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-row-3col {
+  display: grid;
+  grid-template-columns: 140px 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+
+  .field-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .form-input {
+    background: var(--bg-surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    padding: 0 10px;
+    height: 40px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.15s;
+    &:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
+  }
+
+  .full-width-select { width: 100%; }
+}
+
+.field-error-msg {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #e24b4a;
+  font-size: 12px;
+  margin-top: 4px;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; line-height: 14px; }
+}
+
+.field-hint-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+// ── Form actions ──────────────────────────────────────────
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+
+  .btn-cancel {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover { background: var(--bg-surface-2); }
+  }
+
+  .btn-save {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    &:hover { background: var(--accent-hover); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+}
+
+// ── Table card ────────────────────────────────────────────
+.table-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.assets-table {
+  width: 100%;
+
+  .mat-mdc-header-row {
+    background: var(--bg-surface-2);
+  }
+
+  .mat-mdc-header-cell {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border-strong);
+    padding: 12px 16px;
+  }
+
+  .mat-mdc-cell {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-row {
+    cursor: pointer;
+    transition: background 0.12s;
+    &:hover { background: var(--bg-surface-2); }
+    &:last-child td { border-bottom: none; }
+  }
+}
+
+.asset-id-badge {
+  display: inline-block;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.sl-badge {
+  display: inline-block;
+  background: var(--bg-surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.linked-assets-cell {
+  max-width: 280px;
+  font-size: 12px;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-row-delete {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  opacity: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.15s;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; line-height: 16px; }
+
+  &:hover { background: rgba(211, 47, 47, 0.1); color: #d32f2f; }
+}
+
+.table-row:hover .btn-row-delete { opacity: 1; }
+
+// ── Empty state ───────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  text-align: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 12px;
+  }
+
+  .btn-primary-add {
+    background: var(--accent);
+    color: #ffffff;
+    height: 36px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    cursor: pointer;
+    &:hover { background: var(--accent-hover); }
+
+    .btn-icon { font-size: 16px; width: 16px; height: 16px; line-height: 16px; }
+  }
+}

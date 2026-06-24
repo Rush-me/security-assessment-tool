@@ -1,0 +1,383 @@
+<div class="risks-container">
+
+  <!-- Empty-list validation banner -->
+  @if (listSubmitted() && risks().length === 0) {
+    <div class="validation-banner">
+      <mat-icon>warning</mat-icon>
+      Add at least one risk scenario before continuing.
+    </div>
+  }
+
+  <!-- Header row -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">Risk Scenarios</h1>
+      <p class="page-subtitle">
+        Model threat scenarios, link attack paths, and evaluate inherent vs. residual risk.
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+      <button class="btn-primary-add" (click)="onAddRisk()">
+        <mat-icon class="btn-icon">add</mat-icon>
+        <span>Add Risk Scenario</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Two-column Split Layout -->
+  <div class="split-layout">
+    
+    <!-- LEFT PANEL: Risk Register Sidebar -->
+    <div class="left-panel">
+      <div class="register-card">
+        <div class="register-header">
+          <span class="register-label">RISK REGISTER</span>
+          <button class="btn-add-mini" (click)="onAddRisk()">+ Add</button>
+        </div>
+
+        <div class="risk-list">
+          @for (risk of risks(); track (risk.id || risk.riskId)) {
+            <div class="risk-item"
+                 [class.selected]="selectedRisk()?.id === risk.id"
+                 (click)="selectRisk(risk)">
+              <div class="risk-item-main">
+                <div class="risk-item-id">R-{{ (risk.riskId || risk.id || 1) | number:'2.0-0' }}</div>
+                <h4 class="risk-item-title">{{ risk.riskName || (risk.threatAgent + ' ' + risk.threatVerb) }}</h4>
+                <div class="risk-item-badges">
+                  <span class="badge" [class]="'badge-' + getResidualClass(risk.residualRiskLevel)">
+                    {{ risk.residualRiskLevel || 'Low' }}
+                  </span>
+                  <span class="status-badge" [class]="'status-' + (risk.riskManagementDecision === 'Accept' ? 'open' : (risk.riskManagementDecision === 'Transfer' ? 'accepted' : 'mitigated'))">
+                    {{ risk.riskManagementDecision || 'Accept' }}
+                  </span>
+                </div>
+              </div>
+              <button class="btn-delete-item" type="button"
+                      (click)="onDeleteRisk(risk.id!, $event)"
+                      title="Delete risk">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Risk Detail Editor -->
+    <div class="right-panel">
+      @if (selectedRisk()) {
+        <div class="editor-card">
+          
+          <!-- Top Meta Row -->
+          <div class="editor-meta-row">
+            <div class="meta-left">
+              <span class="id-badge">R-{{ (selectedRisk()?.riskId || selectedRisk()?.id || 1) | number:'2.0-0' }}</span>
+              <span class="badge" [class]="'badge-' + getResidualClass(selectedRisk()?.residualRiskLevel)">
+                {{ selectedRisk()?.residualRiskLevel || 'Low' }}
+              </span>
+              <span class="status-badge" [class]="'status-' + (selectedRisk()?.riskManagementDecision === 'Accept' ? 'open' : (selectedRisk()?.riskManagementDecision === 'Transfer' ? 'accepted' : 'mitigated'))">
+                {{ selectedRisk()?.riskManagementDecision || 'Accept' }}
+              </span>
+            </div>
+            <div class="meta-right">
+              Project v{{ activeProject()?.projectVersion || '2.1' }}
+            </div>
+          </div>
+
+          <!-- Fields Form -->
+          <form [formGroup]="riskForm" class="editor-form">
+            
+            <!-- Threat definition header -->
+            <div class="form-header-row">
+              <span class="section-divider-title">Threat Definition</span>
+              <button type="button" class="btn-ai-suggest"
+                      [disabled]="aiState() !== 'available' || (!riskForm.get('businessAssetRefId')?.value && !riskForm.get('supportingAssetRefId')?.value) || isLoadingSuggestions()"
+                      (click)="onSuggestThreats()">
+                @if (isLoadingSuggestions()) {
+                  <mat-spinner diameter="16" style="display:inline-block; margin-right:6px"></mat-spinner>
+                  <span>Generating...</span>
+                } @else {
+                  <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px;margin-right:4px">auto_awesome</mat-icon>
+                  <span>Suggest Threats</span>
+                }
+              </button>
+            </div>
+            @if (!riskForm.get('businessAssetRefId')?.value && !riskForm.get('supportingAssetRefId')?.value) {
+              <p class="ai-hint">Select at least one asset below to enable AI threat suggestions.</p>
+            }
+
+            <div class="form-row">
+              <div class="form-field-group half">
+                <label class="field-label">Threat agent</label>
+                <select formControlName="threatAgent" class="form-select">
+                  @for (a of threatAgents; track a) {
+                    <option [value]="a">{{ a }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-field-group half">
+                <label class="field-label">Threat verb</label>
+                <select formControlName="threatVerb" class="form-select">
+                  @for (v of threatVerbs; track v) {
+                    <option [value]="v">{{ v }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-field-group">
+              <label class="field-label" [class.label-invalid]="isFieldInvalid('motivation')">Motivation / Objective *</label>
+              <input type="text" formControlName="motivation" class="form-input"
+                     [class.field-invalid]="isFieldInvalid('motivation')"
+                     placeholder="e.g. Steal payment credentials and cardholder info" />
+              @if (isFieldInvalid('motivation')) {
+                <span class="field-error-msg">
+                  <mat-icon>warning</mat-icon>Description is required
+                </span>
+              }
+            </div>
+
+            <!-- Asset Scope header -->
+            <div class="section-divider-title">Asset Scope</div>
+
+            <div class="form-row">
+              <div class="form-field-group half">
+                <label class="field-label">Target Business Asset</label>
+                <select formControlName="businessAssetRefId" class="form-select">
+                  <option [value]="null">— None —</option>
+                  @for (ba of businessAssets(); track ba.id) {
+                    <option [value]="ba.id">{{ ba.assetName }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-field-group half">
+                <label class="field-label">Exploited Supporting Asset</label>
+                <select formControlName="supportingAssetRefId" class="form-select">
+                  <option [value]="null">— None —</option>
+                  @for (sa of supportingAssets(); track sa.id) {
+                    <option [value]="sa.id">{{ sa.assetName }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- AI Threat Suggestions -->
+            @if (aiSuggestions().length > 0 || isLoadingSuggestions()) {
+              <div class="ai-suggestions-box">
+                <div class="ai-title">
+                  <mat-icon style="font-size:16px;width:16px;height:16px;line-height:16px">auto_awesome</mat-icon>
+                  <span>AI Threat Suggestions</span>
+                </div>
+                @if (isLoadingSuggestions()) {
+                  <div class="ai-loading-text">Analyzing linked assets and attack patterns...</div>
+                } @else {
+                  <div class="sug-list">
+                    @for (sug of aiSuggestions(); track sug.rationale) {
+                      <div class="sug-item">
+                        <div class="sug-item-content">
+                          <strong class="sug-name">{{ sug.threatAgent }} {{ sug.threatVerb }}</strong>
+                          <div class="sug-desc">{{ sug.motivation }}</div>
+                          <div class="sug-rationale"><em>{{ sug.rationale }}</em></div>
+                        </div>
+                        <button type="button" class="btn-use-sug" (click)="useThreatSuggestion(sug)">Use</button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Risk Name / Likelihood -->
+            <div class="section-divider-title">Risk Scoring (OWASP Likelihood &amp; Management)</div>
+            
+            <div class="form-row likelihood-grid">
+              <div class="form-field-group">
+                <label class="field-label">Skill Level (1-9)</label>
+                <input type="number" formControlName="skillLevel" class="form-input" min="1" max="9" />
+              </div>
+              <div class="form-field-group">
+                <label class="field-label">Reward (1-9)</label>
+                <input type="number" formControlName="reward" class="form-input" min="1" max="9" />
+              </div>
+              <div class="form-field-group">
+                <label class="field-label">Access/Resources (1-9)</label>
+                <input type="number" formControlName="accessResources" class="form-input" min="1" max="9" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field-group third">
+                <label class="field-label">Management Decision</label>
+                <select formControlName="riskManagementDecision" class="form-select">
+                  @for (d of managementDecisions; track d) {
+                    <option [value]="d">{{ d }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-field-group two-thirds">
+                <label class="field-label">Decision Justification</label>
+                <input type="text" formControlName="riskManagementDetail" class="form-input"
+                       placeholder="Explain the mitigation justification..." />
+              </div>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-label">LIKELIHOOD</span>
+                <span class="metric-value">{{ selectedRisk()?.riskLikelihood || 5.0 }}</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">IMPACT</span>
+                <span class="metric-value">{{ selectedRisk()?.riskImpact || 5.0 }}</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">INHERENT RISK</span>
+                <span class="metric-value cvss-score">{{ selectedRisk()?.inherentRiskScore || 5.0 }}</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">RESIDUAL RISK</span>
+                <span class="metric-value residual-level" [style.color]="getSeverityColor(selectedRisk()?.residualRiskLevel)">
+                  {{ selectedRisk()?.residualRiskLevel || 'Low' }} ({{ selectedRisk()?.residualRiskScore || 5.0 }})
+                </span>
+              </div>
+            </div>
+
+          </form>
+
+          <!-- Attack paths and vulnerability linking -->
+          <div class="sub-section">
+            <div class="sub-section-header">
+              <h3 class="sub-section-title">Attack Paths</h3>
+              <button class="btn-add-path" (click)="addAttackPath(selectedRisk()!.id!)">
+                + Add Attack Path
+              </button>
+            </div>
+
+            @if (!selectedRisk()?.riskAttackPaths?.length) {
+              <div class="empty-sub-state">No attack paths modeled. Add one to link vulnerabilities.</div>
+            }
+
+            <div class="paths-list">
+              @for (path of selectedRisk()?.riskAttackPaths; track path.id) {
+                <div class="path-item-card">
+                  <div class="path-item-header">
+                    <strong>Path AP-{{ path.attackPathId }}</strong>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span class="path-score">Score: <strong>{{ path.attackPathScore || '0' }}</strong></span>
+                      <button class="btn-delete-path" (click)="deleteAttackPath(selectedRisk()!.id!, path.id!)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="linked-vulns">
+                    @for (ref of path.vulnerabilityRefs; track ref.id) {
+                      <span class="vuln-ref-badge">
+                        {{ ref.name }} (CVSS: {{ ref.score }})
+                        <button type="button" class="btn-remove-vuln" (click)="removeVulnRef(selectedRisk()!.id!, path.id!, ref.id!)">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
+
+                  <div class="add-vuln-selector-row">
+                    <label class="selector-lbl">Link Vulnerability:</label>
+                    <select class="form-select inline-select" (change)="addVulnToPath(selectedRisk()!.id!, path.id!, getSelectedVulnId($event))">
+                      <option [value]="''">Select vulnerability...</option>
+                      @for (v of vulnerabilities(); track v.id) {
+                        <option [value]="v.id">{{ v.vulnerabilityName }} (CVSS: {{ v.cveScore }})</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Controls & mitigations -->
+          <div class="sub-section">
+            <div class="sub-section-header">
+              <h3 class="sub-section-title">Security Controls &amp; Mitigations</h3>
+              <button class="btn-add-mitigation" (click)="onAddMitigation(selectedRisk()!.id!)">
+                + Add Mitigation
+              </button>
+            </div>
+
+            <!-- Inline Mitigation Form -->
+            @if (editingMitigation()?.riskId === selectedRisk()?.id) {
+              <div class="mitigation-edit-box">
+                <form [formGroup]="mitigationForm" (ngSubmit)="onSubmitMitigation()">
+                  <div class="form-field-group">
+                    <label class="field-label">Mitigation description</label>
+                    <textarea formControlName="description" class="form-textarea" placeholder="Describe control..."></textarea>
+                  </div>
+                  <div class="form-row" style="margin-top:10px">
+                    <div class="form-field-group half">
+                      <label class="field-label">Benefits (0.0-1.0)</label>
+                      <input type="number" formControlName="benefits" class="form-input" min="0" max="1" step="0.05" />
+                    </div>
+                    <div class="form-field-group half">
+                      <label class="field-label">Decision</label>
+                      <select formControlName="decision" class="form-select">
+                        @for (d of mitigationDecisions; track d) {
+                          <option [value]="d">{{ d }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mitigation-btn-row">
+                    <button type="button" class="btn-cancel-mit" (click)="editingMitigation.set(null)">Cancel</button>
+                    <button type="submit" class="btn-save-mit" [disabled]="mitigationForm.invalid">Save</button>
+                  </div>
+                </form>
+              </div>
+            }
+
+            @if (!selectedRisk()?.riskMitigations?.length) {
+              <div class="empty-sub-state">No mitigations recorded. Add security controls to reduce risk levels.</div>
+            }
+
+            <div class="mitigations-list">
+              @for (mit of selectedRisk()?.riskMitigations; track mit.id) {
+                <div class="mitigation-item-row">
+                  <div class="mitigation-info">
+                    <div class="mitigation-desc">{{ mit.description }}</div>
+                    <div class="mitigation-meta">
+                      <span class="mitigation-decision-pill">{{ mit.decision }}</span>
+                      <span class="mitigation-benefit">Benefits: {{ (mit.benefits || 0) * 100 | number:'1.0-0' }}%</span>
+                    </div>
+                  </div>
+                  <div class="mitigation-actions">
+                    <button class="btn-icon-edit" (click)="onEditMitigation(selectedRisk()!.id!, mit)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button class="btn-icon-delete" (click)="onDeleteMitigation(selectedRisk()!.id!, mit.id!)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+      } @else {
+        <div class="empty-editor-state">
+          <mat-icon>gavel</mat-icon>
+          <h3>No risk scenario selected</h3>
+          <p>Select a risk scenario from the register to view and edit details.</p>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>

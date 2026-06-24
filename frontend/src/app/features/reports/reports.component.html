@@ -1,0 +1,170 @@
+<div class="reports-container">
+
+  <!-- ── HEADER ROW ───────────────────────────────────────────────────────── -->
+  <div class="header-row">
+    <div class="header-left">
+      <h1 class="page-title">ISRA report</h1>
+      <p class="page-subtitle">
+        Generated security risk assessment for {{ activeProject()?.projectName || 'SecurePay Gateway' }} v{{ activeProject()?.projectVersion || '2.1' }}
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-outline-about">
+        <mat-icon class="btn-icon">info</mat-icon>
+        <span>About this data</span>
+      </button>
+      <button class="btn-primary-export" [matMenuTriggerFor]="exportMenu">
+        <mat-icon class="btn-icon">upload_file</mat-icon>
+        <span>Export</span>
+      </button>
+      <mat-menu #exportMenu="matMenu">
+        <button mat-menu-item (click)="exportCsv()">
+          <mat-icon>table_chart</mat-icon>
+          <span>Risks CSV</span>
+        </button>
+        <button mat-menu-item (click)="exportVulnCsv()">
+          <mat-icon>bug_report</mat-icon>
+          <span>Vulnerabilities CSV</span>
+        </button>
+        <button mat-menu-item (click)="exportJson()">
+          <mat-icon>code</mat-icon>
+          <span>Full Assessment JSON</span>
+        </button>
+      </mat-menu>
+    </div>
+  </div>
+
+  <!-- ── KPI CARDS ────────────────────────────────────────────────────────── -->
+  <div class="kpi-row">
+
+    <div class="kpi-card">
+      <span class="kpi-label">TOTAL RISKS</span>
+      <span class="kpi-value">{{ totalRisks() || 10 }}</span>
+      <span class="kpi-sub">identified</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">HIGH / CRITICAL</span>
+      <span class="kpi-value kpi-danger">{{ highAndCriticalCount() || 2 }}</span>
+      <span class="kpi-sub">residual</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">AVG. RESIDUAL</span>
+      <span class="kpi-value kpi-safe">{{ (avgResidualRisk() || 0.38) | number:'1.2-2' }}</span>
+      <span class="kpi-sub">score 0–1</span>
+    </div>
+
+    <div class="kpi-card">
+      <span class="kpi-label">TO MITIGATE</span>
+      <span class="kpi-value kpi-accent">{{ toMitigateCount() || 6 }}</span>
+      <span class="kpi-sub">of {{ totalRisks() || 10 }} risks</span>
+    </div>
+
+  </div>
+
+  <!-- ── CHART CARD ────────────────────────────────────────────────────────── -->
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div>
+        <div class="chart-title">Project security risks</div>
+        <div class="chart-subtitle">Residual risk score by management decision. Each point is a risk; colour denotes residual risk level.</div>
+      </div>
+    </div>
+
+    <div class="chart-body">
+
+      <!-- Y-axis labels -->
+      <div class="y-axis">
+        @for (tick of [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]; track tick) {
+          <span class="y-tick">{{ tick | number:'1.1-1' }}</span>
+        }
+      </div>
+
+      <!-- Plot area -->
+      <div class="plot-area">
+        <!-- Background bands -->
+        <div class="band band-danger"></div>
+        <div class="band band-safe"></div>
+
+        <!-- Reference lines -->
+        <div class="ref-line ref-line-danger" style="bottom: 67.5%"></div>
+        <div class="ref-line ref-line-safe" style="bottom: 32.5%"></div>
+
+        <!-- Three decision columns -->
+        <div class="decision-columns">
+          @for (col of ['Accept', 'Transfer', 'Mitigate']; track col) {
+            <div class="decision-col">
+              @for (row of getColumnRows(col); track row.id) {
+                <div class="risk-dot"
+                     [style.bottom]="getDotBottom(row.residual)"
+                     [style.background]="getDotColor(row.level)"
+                     [title]="row.name + ' (' + row.id + ')'">
+                  {{ row.id }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- X-axis labels -->
+        <div class="x-axis">
+          <span>Accept</span>
+          <span>Transfer</span>
+          <span>Mitigate</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Legend -->
+    <div class="chart-legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#22c55e"></span><span>Low</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>Moderate</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#f97316"></span><span>High</span></div>
+      <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Critical</span></div>
+    </div>
+  </div>
+
+  <!-- ── RISK REGISTER TABLE ──────────────────────────────────────────────── -->
+  <div class="table-card">
+    <div class="table-card-header">Detailed risk register</div>
+    <table class="risk-table">
+      <thead>
+        <tr>
+          <th class="col-desc">RISK DESCRIPTION</th>
+          <th class="col-score">INHERENT</th>
+          <th class="col-score">MITIGATED</th>
+          <th class="col-score">RESIDUAL</th>
+          <th class="col-badge">RISK LEVEL</th>
+          <th class="col-badge">MGMT DECISION</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of tableRows(); track row.id) {
+          <tr class="risk-row">
+            <td class="col-desc">
+              <div class="risk-name">{{ row.name }}</div>
+              <div class="risk-id">{{ row.id }}</div>
+            </td>
+            <td class="col-score score-body">{{ row.inherent | number:'1.2-2' }}</td>
+            <td class="col-score score-body muted">{{ row.mitigated | number:'1.2-2' }}</td>
+            <td class="col-score score-body bold">{{ row.residual | number:'1.2-2' }}</td>
+            <td class="col-badge">
+              <span class="pill" [ngClass]="'pill-level-' + getLevelClass(row.level)">
+                {{ row.level }}
+              </span>
+            </td>
+            <td class="col-badge">
+              <span class="pill" [ngClass]="'pill-decision-' + getDecisionClass(row.decision)">
+                {{ row.decision }}
+              </span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+</div>
+

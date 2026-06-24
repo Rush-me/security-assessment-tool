@@ -1,0 +1,182 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+:root {
+  --bg-page: #f0f2f5;
+  --bg-nav: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f7f8fa;
+  --bg-card: #ffffff;
+  --text-primary: #0f1923;
+  --text-secondary: #5a6478;
+  --text-muted: #9ba5b8;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.16);
+  --accent: #1a56db;
+  --accent-hover: #1447c0;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0d1117;
+  --bg-nav: #161b26;
+  --bg-surface: #161b26;
+  --bg-surface-2: #1e2436;
+  --bg-card: #1a2033;
+  --text-primary: #e8ecf4;
+  --text-secondary: #8b95aa;
+  --text-muted: #5a6478;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.14);
+  --accent: #4d7fff;
+  --accent-hover: #6690ff;
+}
+
+// --- Base reset ---
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+// --- Global scrollbar ---
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: $scroll-color; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: darken($scroll-color, 15%); }
+
+// --- Page wrapper ---
+.isra-page {
+  padding: 24px 28px;
+  max-width: 1300px;
+  margin: 0 auto;
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// --- Page header row ---
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+
+  .page-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+  }
+
+  .page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+// --- White card surface ---
+.isra-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+// --- Risk level badges ---
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &-critical  { background: #FEECEB; color: #E03B26; border: 1px solid #f5c0bc; }
+  &-high      { background: #FEECEB; color: #E03B26; border: 1px solid #f5c0bc; }
+  &-moderate, &-medium { background: #F9E4CC; color: #E07900; border: 1px solid #f0c898; }
+  &-low       { background: #D1E6DA; color: #288046; border: 1px solid #b2d4be; }
+  &-none      { background: var(--bg-surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
+  &-accept    { background: #CCF2F8; color: #0077aa; border: 1px solid #a3dce9; }
+  &-transfer  { background: #EFD3E3; color: #8b2270; border: 1px solid #d9a5c4; }
+  &-mitigate  { background: #D1E6DA; color: #288046; border: 1px solid #b2d4be; }
+}
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &-draft     { background: var(--bg-surface-2); color: var(--text-secondary); }
+  &-review    { background: #CDD0EA; color: #3040a0; }
+  &-approved  { background: #D1E6DA; color: #288046; }
+}
+
+// --- Buttons override ---
+.btn-primary {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em;
+
+  &:hover { background: var(--accent-hover) !important; }
+}
+
+.btn-outline {
+  border: 1px solid var(--border-strong) !important;
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-radius: 6px !important;
+
+  &:hover { background: var(--bg-surface-2) !important; }
+}
+
+// --- Mat overrides for theme ---
+.mat-mdc-card {
+  background: var(--bg-card) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-color: var(--bg-surface);
+  border-radius: 16px !important;
+}
+
+.mat-mdc-form-field-focus-indicator {
+  color: var(--accent) !important;
+}
+
+.mat-mdc-raised-button.mat-primary {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+}

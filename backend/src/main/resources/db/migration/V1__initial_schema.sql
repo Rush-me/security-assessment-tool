@@ -53,7 +53,7 @@ CREATE TABLE business_assets (
     integrity INT DEFAULT 0,
     availability INT DEFAULT 0,
     authenticity INT DEFAULT 0,
-    authorization INT DEFAULT 0,
+    asset_authorization INT DEFAULT 0,
     non_repudiation INT DEFAULT 0,
     FOREIGN KEY (project_id) REFERENCES isra_projects(id) ON DELETE CASCADE
 );

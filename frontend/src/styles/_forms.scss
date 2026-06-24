@@ -1,0 +1,208 @@
+@use 'variables' as *;
+
+// ============================================================
+// ANGULAR MATERIAL FORM FIELDS - ISRA LIGHT THEME
+// ============================================================
+
+.mat-mdc-form-field {
+  width: 100%;
+
+  .mat-mdc-text-field-wrapper {
+    background: var(--bg-surface) !important;
+    border-radius: 6px !important;
+  }
+
+  .mdc-floating-label {
+    color: var(--text-secondary) !important;
+  }
+
+  &.mat-focused .mdc-floating-label {
+    color: var(--accent) !important;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: var(--border-strong) !important;
+  }
+
+  &.mat-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: var(--accent) !important;
+      border-width: 2px !important;
+    }
+  }
+
+  .mat-mdc-input-element {
+    color: var(--text-primary) !important;
+    caret-color: var(--accent) !important;
+    font-size: 0.9rem;
+  }
+
+  textarea.mat-mdc-input-element {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .mat-mdc-form-field-error {
+    color: #e24b4a !important;
+    font-size: 0.78rem;
+  }
+}
+
+// Select dropdown
+.mat-mdc-select-panel {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  border-radius: 6px !important;
+}
+
+.mat-mdc-option {
+  color: var(--text-primary) !important;
+  font-size: 0.9rem !important;
+
+  &:hover,
+  &.mdc-list-item--selected {
+    background: var(--bg-surface-2) !important;
+  }
+}
+
+.mat-mdc-select-value {
+  color: var(--text-primary) !important;
+}
+
+// Form layout grids
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  &.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  &.full { grid-template-columns: 1fr; }
+}
+
+.form-section {
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+
+  .form-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .form-section-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: -10px 0 16px;
+  }
+}
+
+// Inline URL display
+.url-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--accent);
+  }
+
+  a {
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ============================================================
+// WIZARD VALIDATION — global classes used across all tabs
+// ============================================================
+
+// Red border + background for invalid custom inputs/textareas/selects
+.field-invalid {
+  border: 1px solid #e24b4a !important;
+  box-shadow: 0 0 0 3px rgba(226, 75, 74, 0.15) !important;
+  background: #fff8f8 !important;
+
+  [data-theme='dark'] & {
+    background: #2d1a1a !important;
+  }
+}
+
+// Inline error message below invalid field
+.field-error-msg {
+  font-size: 11px;
+  color: #e24b4a;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    line-height: 12px;
+  }
+}
+
+// Label color override when field is invalid
+.label-invalid {
+  color: #e24b4a !important;
+}
+
+// Banner for empty-list validation
+.validation-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #991b1b;
+  margin-bottom: 14px;
+  font-weight: 500;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    flex-shrink: 0;
+  }
+}
+
+// Angular Material form field: red outline when invalid + touched
+.mat-mdc-form-field.ng-invalid.ng-touched {
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: #e24b4a !important;
+    border-width: 2px !important;
+  }
+
+  .mdc-floating-label {
+    color: #e24b4a !important;
+  }
+}

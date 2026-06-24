@@ -1,0 +1,197 @@
+<!-- DASHBOARD PAGE -->
+<div class="dashboard-shell">
+
+  <!-- Top nav bar -->
+  <header class="isra-navbar">
+    <div class="header-brand">
+      <div class="brand-logo-container">
+        <svg class="brand-logo-svg" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <div class="brand-text-col">
+        <span class="brand-name">ISRA<span class="brand-dot">.</span></span>
+        <span class="brand-sub">Security Risk Assessment</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-new-assessment" (click)="showCreateForm.set(true)">
+        <mat-icon>add</mat-icon> New Assessment
+      </button>
+
+      <button class="btn-theme-toggle" (click)="toggleTheme()" matTooltip="Toggle Theme">
+        @if (currentTheme() === 'light') {
+          <mat-icon>dark_mode</mat-icon>
+        } @else {
+          <mat-icon>light_mode</mat-icon>
+        }
+      </button>
+
+      <div class="user-avatar-wrapper">
+        <button class="user-avatar-btn" (click)="toggleUserPopup($event)">
+          {{ getUserInitials() }}
+        </button>
+
+        @if (showUserPopup()) {
+          <div class="user-popup-container">
+            <div class="popup-header">
+              <div class="popup-avatar">{{ getUserInitials() }}</div>
+              <div class="popup-user-info">
+                <span class="popup-name">{{ currentUser()?.username }}</span>
+                <span class="popup-email">{{ currentUser()?.email || 'no-email@thales.com' }}</span>
+              </div>
+            </div>
+            <hr class="popup-divider" />
+            <button class="popup-row">
+              <mat-icon>person_outline</mat-icon>
+              <span>My profile</span>
+            </button>
+            <button class="popup-row">
+              <mat-icon>settings</mat-icon>
+              <span>Settings</span>
+            </button>
+            <hr class="popup-divider" />
+            <button class="popup-row sign-out" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Sign out</span>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- Page content -->
+  <main class="dashboard-content">
+    <div class="isra-page">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Risk assessments</h1>
+          <p class="page-subtitle">
+            Information Security Risk Assessments analysed across all departments.
+            Open a project to view its iteration history or generate the ISRA report.
+          </p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="search-box">
+            <mat-icon>search</mat-icon>
+            <input type="text" placeholder="Search projects" [(ngModel)]="searchQuery" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects Grid -->
+      @if (filteredProjects().length > 0) {
+        <div class="projects-grid">
+          @for (proj of filteredProjects(); track proj.id) {
+            <div class="project-card" (click)="openProject(proj)">
+              <div class="card-header">
+                <h3 class="project-name">{{ proj.projectName }}</h3>
+                <span class="project-dept">{{ proj.projectOrganization || 'No Department' }}</span>
+              </div>
+              <div class="card-body">
+                <div class="stats-row">
+                  <span class="stat-item">
+                    <strong>{{ proj.risks?.length || 0 }}</strong> {{ (proj.risks?.length === 1 ? 'Risk' : 'Risks') }}
+                  </span>
+                  <span class="stats-dot">·</span>
+                  <span class="stat-item">
+                    <strong>{{ proj.vulnerabilities?.length || 0 }}</strong> {{ (proj.vulnerabilities?.length === 1 ? 'Vulnerability' : 'Vulnerabilities') }}
+                  </span>
+                </div>
+                <div class="risk-badge-wrapper">
+                  <span class="badge" [class]="'badge-' + getTopRiskLevel(proj)">
+                    {{ getTopRiskLevel(proj) | titlecase }} Risk
+                  </span>
+                </div>
+              </div>
+              <div class="card-footer">
+                <span class="updated-date">Updated {{ proj.updatedAt | date:'dd MMM yyyy' }}</span>
+                <button class="btn-delete-card" (click)="onDeleteProject(proj.id!, $event)" matTooltip="Delete Assessment">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Dedicated "Create new assessment" card -->
+          <div class="project-card create-new-card" (click)="showCreateForm.set(true)">
+            <div class="create-card-content">
+              <div class="create-icon-wrapper">
+                <mat-icon>add</mat-icon>
+              </div>
+              <span class="create-text">Create new assessment</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (filteredProjects().length === 0) {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">folder_open</mat-icon>
+          <h3>No assessments found</h3>
+          <p>Click "New Assessment" to start your first security risk analysis.</p>
+          <button mat-raised-button class="btn-new-assessment" (click)="showCreateForm.set(true)">
+            <mat-icon>add</mat-icon> New Assessment
+          </button>
+        </div>
+      }
+
+    </div>
+  </main>
+
+  <!-- Create Dialog -->
+  @if (showCreateForm()) {
+    <div class="modal-backdrop" (click)="showCreateForm.set(false)">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">New Assessment</h2>
+          <button mat-icon-button (click)="showCreateForm.set(false)">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="projectForm" (ngSubmit)="onCreateProject()">
+            <mat-form-field appearance="outline">
+              <mat-label>Project name</mat-label>
+              <input matInput formControlName="projectName" placeholder="e.g. SecurePay Gateway">
+              @if (projectForm.get('projectName')?.hasError('required')) {
+                <mat-error>Project name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="form-row-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Project version</mat-label>
+                <input matInput formControlName="projectVersion" placeholder="e.g. 2.1">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Department</mat-label>
+                <input matInput formControlName="projectOrganization" placeholder="e.g. Payments &amp; Fintech">
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Classification</mat-label>
+              <mat-select formControlName="classification">
+                @for (cls of classifications; track cls) {
+                  <mat-option [value]="cls">{{ cls }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <div class="modal-footer">
+              <button mat-button type="button" (click)="showCreateForm.set(false)">Cancel</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid">
+                Create Assessment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

@@ -48,7 +48,7 @@ public class BusinessAsset {
     @Column(name = "authenticity")
     private Integer authenticity;
 
-    @Column(name = "authorization")
+    @Column(name = "asset_authorization")
     private Integer authorization;
 
     @Column(name = "non_repudiation")
