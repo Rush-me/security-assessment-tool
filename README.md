@@ -18,7 +18,7 @@ An optional **Google Gemini AI** integration suggests relevant threats and vulne
 ## Architecture
 
 ```
-isra/
+security-assessment-tool/
 ├── frontend/          Angular 18 SPA (the UI)
 ├── backend/           Spring Boot 3 REST API + H2 embedded database
 └── electron/          Electron shell that bundles frontend + backend into a desktop app
