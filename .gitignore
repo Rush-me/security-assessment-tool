@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS/editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local generated test artifacts
+e2e/playwright-electron-framework/reports/
+e2e/playwright-electron-framework/screenshots/
+e2e/playwright-electron-framework/traces/

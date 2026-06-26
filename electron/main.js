@@ -24,7 +24,21 @@ const fs = require('fs');
 const { spawn } = require('child_process');
 
 // ── Logging ──────────────────────────────────────────────────────────────────
-const log = require('electron-log');
+let log;
+try {
+  log = require('electron-log');
+} catch (_err) {
+  // Fallback logger keeps app startup alive in constrained test environments.
+  log = {
+    transports: {
+      file: { resolvePathFn: null, level: 'debug' },
+      console: { level: 'debug' }
+    },
+    info: (...args) => console.log(...args),
+    warn: (...args) => console.warn(...args),
+    error: (...args) => console.error(...args)
+  };
+}
 
 function setupLogging(userDataPath) {
   const logDir = path.join(userDataPath, 'logs');
@@ -383,6 +397,8 @@ function closeSplash() {
 let mainWindow = null;
 
 function createWindow(backendPort) {
+  const distIndex = path.join(__dirname, '..', 'frontend', 'dist', 'frontend', 'browser', 'index.html');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -400,29 +416,61 @@ function createWindow(backendPort) {
     show: false,
   });
 
-  // Handle Angular HTML5 deep-link routing in production
-  mainWindow.webContents.on('did-fail-load', (_event, _code, _desc, url) => {
+  // Handle Angular HTML5 deep-link routing in production + dev fallback behavior.
+  mainWindow.webContents.on('did-fail-load', (_event, code, desc, url) => {
+    log.warn(`Renderer did-fail-load: code=${code}, desc=${desc}, url=${url}`);
+
     if (url.startsWith('file://') && !url.endsWith('index.html')) {
       const { hash } = new URL(url);
       mainWindow.loadFile(
         resolveResourcePath('frontend', 'index.html'),
         { hash: hash ? hash.replace(/^#/, '') : '/' }
       );
+      return;
+    }
+
+    // Dev fallback: if Angular dev server is unavailable, load built dist file.
+    if (!app.isPackaged && url.startsWith('http://localhost:4200')) {
+      if (fs.existsSync(distIndex)) {
+        log.warn(`Dev server unavailable; falling back to dist build: ${distIndex}`);
+        mainWindow.loadFile(distIndex);
+      } else {
+        dialog.showErrorBox(
+          'Frontend Load Failed',
+          `Could not load Angular dev server at http://localhost:4200 and dist build was not found.\n\nExpected dist index at:\n${distIndex}`
+        );
+      }
     }
   });
 
-  // Swap splash for main window once Angular has actually rendered
-  mainWindow.once('ready-to-show', () => {
+  // Swap splash for main window once Angular has actually finished loading.
+  mainWindow.webContents.once('did-finish-load', () => {
     closeSplash();
     mainWindow.show();
   });
 
   if (app.isPackaged) {
     mainWindow.loadFile(resolveResourcePath('frontend', 'index.html'));
+  } else if (process.env.NODE_ENV === 'test') {
+    // Test mode: always load from built Angular dist.
+    mainWindow.loadFile(distIndex);
   } else {
-    // Development: load from Angular dev server
-    mainWindow.loadURL('http://localhost:4200');
-    //mainWindow.webContents.openDevTools();
+    // Local dev default: use built dist for reliable startup.
+    // To force dev-server mode, run with ELECTRON_USE_DEV_SERVER=1.
+    const useDevServer = process.env.ELECTRON_USE_DEV_SERVER === '1';
+    if (useDevServer) {
+      mainWindow.loadURL('http://localhost:4200');
+      mainWindow.webContents.openDevTools();
+    } else if (fs.existsSync(distIndex)) {
+      mainWindow.loadFile(distIndex);
+    } else {
+      dialog.showErrorBox(
+        'Frontend Build Missing',
+        `Built frontend not found at:\n${distIndex}\n\nRun: cd frontend && npm run build -- --configuration=electron`
+      );
+      app.quit();
+      return;
+    }
   }
 
   mainWindow.on('closed', () => { mainWindow = null; });
