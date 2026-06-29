@@ -58,19 +58,12 @@ https://angular.dev/essentials/signals
 https://angular.dev/essentials/templates
 https://angular.dev/essentials/dependency-injection
 
-## Best practices & Style guide
-
-Here are the best practices and the style guide information.
-
-https://confluence.thalesags.com/spaces/SERVO/pages/37298844/Coding+Guidelines+and+Best+Practices
 
 ### Coding Style guide
 
 Here is a link to the most recent Angular style guide https://angular.dev/style-guide
 
 ### Reactive forms guide
-
-Here is a link to to follow for reactive forms https://confluence.thalesags.com/spaces/SERVO/pages/62753976/Form+Validation+Specification
 
 https://angular.dev/guide/forms/reactive-forms
 
