@@ -11,6 +11,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AboutDataService } from '../../core/services/about-data.service';
 
 import { ActivatedRoute } from '@angular/router';
 
@@ -25,7 +27,8 @@ import { ActivatedRoute } from '@angular/router';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './project-context.component.html',
   styleUrls: ['./project-context.component.scss']
@@ -37,6 +40,7 @@ export class ProjectContextComponent implements OnInit, OnDestroy {
   private projectService = inject(ProjectService);
   private validationService = inject(WizardValidationService);
   private snackBar = inject(MatSnackBar);
+  private aboutDataService = inject(AboutDataService);
   private route = inject(ActivatedRoute);
 
   contextForm: FormGroup;
@@ -108,6 +112,10 @@ export class ProjectContextComponent implements OnInit, OnDestroy {
   openDrawer() {
     // Emit event to parent layout to open drawer
     // Layout reads active step already — no-op here, parent handles it
+  }
+
+  openAbout(): void {
+    this.aboutDataService.open('project-context');
   }
 
   private saveAndContinue(): void {

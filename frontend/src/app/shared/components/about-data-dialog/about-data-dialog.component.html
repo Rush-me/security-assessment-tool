@@ -1,0 +1,112 @@
+<h2 mat-dialog-title class="dialog-title">
+  {{ data.title }}
+</h2>
+
+<mat-dialog-content class="dialog-content">
+
+  <!-- ===== FLOW DIAGRAM (basic-info page) ===== -->
+  @if (data.showDiagram) {
+    <p class="dialog-body intro-body">{{ data.body }}</p>
+
+    <!-- 5-Dimension Risk Flow Diagram -->
+    <div class="flow-diagram-wrapper">
+      <svg class="flow-diagram-svg" viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ISRA 5-dimension risk flow diagram">
+        <!-- ── ARROWS ──────────────────────────────────────────────────── -->
+        <!-- Business Assets → Risk -->
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#6b7280"/>
+          </marker>
+        </defs>
+        <line x1="136" y1="90" x2="290" y2="110" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Supporting Assets → Risk -->
+        <line x1="136" y1="140" x2="290" y2="120" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Vulnerabilities → Risk -->
+        <line x1="136" y1="185" x2="290" y2="130" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Threats → Risk -->
+        <line x1="136" y1="50" x2="290" y2="105" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Threat Agent → Risk -->
+        <line x1="136" y1="210" x2="290" y2="135" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- Risk → Impact / Likelihood -->
+        <line x1="470" y1="115" x2="570" y2="85"  stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+        <line x1="470" y1="125" x2="570" y2="155" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- ── DIMENSION NODES ─────────────────────────────────────────── -->
+        <!-- Business Assets (green) -->
+        <rect x="4"  y="62"  width="132" height="32" rx="8" fill="#92d050" fill-opacity="0.18" stroke="#92d050" stroke-width="1.5"/>
+        <text x="70" y="82" text-anchor="middle" font-size="12" font-weight="600" fill="#3a6b00">Business Assets</text>
+
+        <!-- Supporting Assets (orange) -->
+        <rect x="4"  y="107" width="132" height="32" rx="8" fill="#ffc000" fill-opacity="0.18" stroke="#ffc000" stroke-width="1.5"/>
+        <text x="70" y="127" text-anchor="middle" font-size="12" font-weight="600" fill="#7a5a00">Supporting Assets</text>
+
+        <!-- Vulnerabilities (red) -->
+        <rect x="4"  y="162" width="132" height="32" rx="8" fill="#f37989" fill-opacity="0.18" stroke="#f37989" stroke-width="1.5"/>
+        <text x="70" y="182" text-anchor="middle" font-size="12" font-weight="600" fill="#8b1a2a">Vulnerabilities</text>
+
+        <!-- Threats (yellow) -->
+        <rect x="4"  y="27"  width="132" height="32" rx="8" fill="#fad404" fill-opacity="0.18" stroke="#fad404" stroke-width="1.5"/>
+        <text x="70" y="47"  text-anchor="middle" font-size="12" font-weight="600" fill="#7a6800">Threats</text>
+
+        <!-- Threat Agent (dark) -->
+        <rect x="4"  y="197" width="132" height="32" rx="8" fill="#1e293b" fill-opacity="0.85" stroke="#475569" stroke-width="1.5"/>
+        <text x="70" y="217" text-anchor="middle" font-size="12" font-weight="600" fill="#e2e8f0">Threat Agent</text>
+
+        <!-- ── RISK NODE (centre) ──────────────────────────────────────── -->
+        <rect x="295" y="90" width="170" height="55" rx="10" fill="#1a56db" fill-opacity="0.12" stroke="#1a56db" stroke-width="2"/>
+        <text x="380" y="110" text-anchor="middle" font-size="13" font-weight="700" fill="#1a56db">RISK SCORE</text>
+        <text x="380" y="128" text-anchor="middle" font-size="10" fill="#1a56db" fill-opacity="0.75">= Impact × Likelihood</text>
+
+        <!-- ── OUTPUT NODES ────────────────────────────────────────────── -->
+        <!-- Impact -->
+        <rect x="575" y="62"  width="120" height="32" rx="8" fill="#7c3aed" fill-opacity="0.12" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="635" y="82"  text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">Impact</text>
+
+        <!-- Likelihood -->
+        <rect x="575" y="132" width="120" height="32" rx="8" fill="#0891b2" fill-opacity="0.12" stroke="#0891b2" stroke-width="1.5"/>
+        <text x="635" y="152" text-anchor="middle" font-size="12" font-weight="600" fill="#0e7490">Likelihood</text>
+
+        <!-- ── LABELS ──────────────────────────────────────────────────── -->
+        <text x="380" y="20"  text-anchor="middle" font-size="11" font-weight="700" fill="#6b7280" letter-spacing="1">ISO/IEC 27005 : 2022</text>
+        <text x="380" y="220" text-anchor="middle" font-size="10" fill="#9ca3af">Five dimensions combine to produce a quantified security risk level</text>
+      </svg>
+    </div>
+
+    <!-- Terminology grid -->
+    <div class="term-grid">
+      <div class="term-card ba">
+        <div class="term-label">Business Asset</div>
+        <div class="term-body">What makes value for the customer — data or services directly visible in the value chain.</div>
+      </div>
+      <div class="term-card sa">
+        <div class="term-label">Supporting Asset</div>
+        <div class="term-body">Technical means that host or protect business assets — software, servers, networks, secure elements.</div>
+      </div>
+      <div class="term-card vuln">
+        <div class="term-label">Vulnerability</div>
+        <div class="term-body">A weakness in a supporting asset that can be exploited by a threat agent to compromise a business asset.</div>
+      </div>
+      <div class="term-card threat">
+        <div class="term-label">Threat</div>
+        <div class="term-body">Anything that could cause harm to assets — the potential event or action leading to impact.</div>
+      </div>
+      <div class="term-card agent">
+        <div class="term-label">Threat Agent</div>
+        <div class="term-body">The individual or group motivated to exploit vulnerabilities — government, mafia, insider, script kiddie.</div>
+      </div>
+      <div class="term-card risk">
+        <div class="term-label">Risk</div>
+        <div class="term-body">Probable frequency × probable magnitude of future loss (ISO 27005: probability × consequence).</div>
+      </div>
+    </div>
+
+  } @else {
+    <!-- ===== DEFAULT TEXT-ONLY DIALOG ===== -->
+    <p class="dialog-body">{{ data.body }}</p>
+  }
+
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

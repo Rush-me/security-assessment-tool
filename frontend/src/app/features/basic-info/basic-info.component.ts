@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Subscription } from 'rxjs';
 import { ProjectService } from '../../core/services/project.service';
 import { WizardValidationService } from '../../core/services/wizard-validation.service';
+import { AboutDataService } from '../../core/services/about-data.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
@@ -19,6 +20,7 @@ export class BasicInfoComponent implements OnInit, OnDestroy {
   private projectService = inject(ProjectService);
   private validationService = inject(WizardValidationService);
   private snackBar = inject(MatSnackBar);
+  private aboutDataService = inject(AboutDataService);
 
   activeProject = this.projectService.activeProject;
   submitted = signal(false);
@@ -70,6 +72,10 @@ export class BasicInfoComponent implements OnInit, OnDestroy {
 
   isFieldInvalid(field: string): boolean {
     return this.submitted() && (this.basicForm.get(field)?.invalid ?? false);
+  }
+
+  openAbout(): void {
+    this.aboutDataService.open('basic-info');
   }
 
   private saveAndProceed(): void {

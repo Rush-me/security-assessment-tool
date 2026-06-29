@@ -216,6 +216,50 @@ public class RiskController {
                     existing.setRiskName(riskRequest.getRiskName());
                 }
 
+                // ── Nested merge: mitigations (ID-based, never remove absent items) ──
+                if (riskRequest.getRiskMitigations() != null) {
+                    for (RiskMitigation reqMit : riskRequest.getRiskMitigations()) {
+                        if (reqMit.getId() == null) continue;
+                        existing.getRiskMitigations().stream()
+                                .filter(m -> m.getId().equals(reqMit.getId()))
+                                .findFirst()
+                                .ifPresent(m -> {
+                                    m.setDescription(reqMit.getDescription());
+                                    m.setBenefits(reqMit.getBenefits());
+                                    m.setCost(reqMit.getCost());
+                                    m.setDecision(reqMit.getDecision());
+                                    m.setDecisionDetail(reqMit.getDecisionDetail());
+                                });
+                    }
+                }
+
+                // ── Nested merge: attack paths and vulnerability refs (ID-based) ──
+                if (riskRequest.getRiskAttackPaths() != null) {
+                    for (RiskAttackPath reqPath : riskRequest.getRiskAttackPaths()) {
+                        if (reqPath.getId() == null) continue;
+                        existing.getRiskAttackPaths().stream()
+                                .filter(p -> p.getId().equals(reqPath.getId()))
+                                .findFirst()
+                                .ifPresent(p -> {
+                                    if (reqPath.getAttackPathName() != null) {
+                                        p.setAttackPathName(reqPath.getAttackPathName());
+                                    }
+                                    if (reqPath.getVulnerabilityRefs() != null) {
+                                        for (RiskVulnerabilityRef reqRef : reqPath.getVulnerabilityRefs()) {
+                                            if (reqRef.getId() == null) continue;
+                                            p.getVulnerabilityRefs().stream()
+                                                    .filter(ref -> ref.getId().equals(reqRef.getId()))
+                                                    .findFirst()
+                                                    .ifPresent(ref -> {
+                                                        if (reqRef.getScore() != null) ref.setScore(reqRef.getScore());
+                                                        if (reqRef.getName() != null) ref.setName(reqRef.getName());
+                                                    });
+                                        }
+                                    }
+                                });
+                    }
+                }
+
                 riskCalculationService.calculateRisk(existing);
                 riskCalculationService.constructRiskName(existing);
                 riskRepository.save(existing);

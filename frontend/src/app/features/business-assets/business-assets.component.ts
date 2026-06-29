@@ -13,6 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
+import { AboutDataService } from '../../core/services/about-data.service';
 
 @Component({
   selector: 'app-business-assets',
@@ -27,7 +29,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatDialogModule
   ],
   templateUrl: './business-assets.component.html',
   styleUrls: ['./business-assets.component.scss']
@@ -38,6 +41,7 @@ export class BusinessAssetsComponent implements OnInit, OnDestroy {
   private projectService = inject(ProjectService);
   private validationService = inject(WizardValidationService);
   private snackBar = inject(MatSnackBar);
+  private aboutDataService = inject(AboutDataService);
 
   assets = signal<BusinessAsset[]>([]);
   activeProject = this.projectService.activeProject;
@@ -99,6 +103,10 @@ export class BusinessAssetsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._subs.unsubscribe();
+  }
+
+  openAbout(): void {
+    this.aboutDataService.open('business-assets');
   }
 
   loadAssets() {
